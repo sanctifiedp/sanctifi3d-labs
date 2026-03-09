@@ -16,12 +16,16 @@ export default function Admin() {
   const [email, setEmail] = useState(""); const [pass, setPass] = useState("");
   const [posts, setPosts] = useState<any[]>([]);
   const [alphas, setAlphas] = useState<any[]>([]);
-  const [tab, setTab] = useState<"posts"|"alpha"|"create"|"create-alpha">("posts");
+  const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [tab, setTab] = useState<"posts"|"alpha"|"create"|"create-alpha"|"subscribers">("posts");
   const [title, setTitle] = useState(""); const [content, setContent] = useState("");
   const [category, setCategory] = useState("Web3"); const [coverUrl, setCoverUrl] = useState("");
   const [alphaTitle, setAlphaTitle] = useState(""); const [alphaContent, setAlphaContent] = useState("");
   const [alphaType, setAlphaType] = useState("Airdrop"); const [alphaAudience, setAlphaAudience] = useState("Crypto");
   const [alphaSource, setAlphaSource] = useState(""); const [alphaCover, setAlphaCover] = useState("");
+  const [newsletterSubject, setNewsletterSubject] = useState("");
+  const [newsletterBody, setNewsletterBody] = useState("");
+  const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -35,7 +39,7 @@ export default function Admin() {
   const btn = (bg2:string, col:string) => ({ background:bg2, color:col, border:"none", borderRadius:8, padding:"8px 16px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" } as any);
 
   useEffect(() => { auth.onAuthStateChanged(u => { if(u&&ADMINS.includes(u.email||"")) setUser(u); }); },[]);
-  useEffect(() => { if(user){ fetchPosts(); fetchAlphas(); } },[user]);
+  useEffect(() => { if(user){ fetchPosts(); fetchAlphas(); fetchSubscribers(); } },[user]);
 
   async function fetchPosts() {
     const snap = await getDocs(query(collection(db,"posts"),orderBy("createdAt","desc")));
@@ -44,6 +48,10 @@ export default function Admin() {
   async function fetchAlphas() {
     const snap = await getDocs(query(collection(db,"alpha"),orderBy("createdAt","desc")));
     setAlphas(snap.docs.map(d=>({id:d.id,...d.data()})));
+  }
+  async function fetchSubscribers() {
+    const snap = await getDocs(query(collection(db,"subscribers"),orderBy("subscribedAt","desc")));
+    setSubscribers(snap.docs.map(d=>({id:d.id,...d.data()})));
   }
   async function login() {
     try { const u = await signInWithEmailAndPassword(auth,email,pass); setUser(u.user); }
@@ -77,6 +85,22 @@ export default function Admin() {
     setAlphaTitle("");setAlphaContent("");setAlphaSource("");setAlphaCover("");setMsg("Alpha published!");
     fetchAlphas();setTab("alpha");setTimeout(()=>setMsg(""),3000);
   }
+  async function sendNewsletter() {
+    if(!newsletterSubject||!newsletterBody){setMsg("Subject and body required");return;}
+    setSending(true);
+    try {
+      const res = await fetch("/api/send-newsletter",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ subject:newsletterSubject, html:newsletterBody, adminKey:"sanctifi3d_admin_2026" })
+      });
+      const data = await res.json();
+      if(data.success) setMsg(`✅ Sent to ${data.sent}/${data.total} subscribers!`);
+      else setMsg("Error: "+data.error);
+    } catch(e:any){ setMsg("Error: "+e.message); }
+    setSending(false);
+    setTimeout(()=>setMsg(""),5000);
+  }
 
   if(!user) return (
     <main style={{fontFamily:"system-ui,sans-serif",background:dark?"#080808":"#f0f0f0",color:fg,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
@@ -98,6 +122,8 @@ export default function Admin() {
     <main style={{fontFamily:"system-ui,sans-serif",background:dark?"#080808":"#f0f0f0",color:fg,minHeight:"100vh",position:"relative"}}>
       <FloatingShapes />
       <div style={{maxWidth:960,margin:"0 auto",padding:"32px 20px",position:"relative",zIndex:1}}>
+
+        {/* HEADER */}
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:28,flexWrap:"wrap",gap:12}}>
           <h1 style={{fontWeight:900,fontSize:20}}>Sanctifi3d<span style={{color:"#34d399"}}>Labs</span> Admin</h1>
           <div style={{display:"flex",gap:10}}>
@@ -108,7 +134,7 @@ export default function Admin() {
 
         {/* STATS */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:10,marginBottom:28}}>
-          {[["Posts",posts.length,"#34d399"],["Pending",pendingPosts.length,"#fbbf24"],["Alphas",alphas.length,"#38bdf8"],["Pending Alpha",pendingAlphas.length,"#f472b6"]].map(([l,v,c])=>(
+          {[["Posts",posts.length,"#34d399"],["Pending",pendingPosts.length,"#fbbf24"],["Alphas",alphas.length,"#38bdf8"],["Subscribers",subscribers.length,"#f472b6"]].map(([l,v,c])=>(
             <div key={l as string} style={{background:cardBg,border:`1px solid ${border}`,borderRadius:12,padding:"14px 16px",backdropFilter:"blur(8px)"}}>
               <p style={{fontSize:22,fontWeight:800,color:c as string,margin:"0 0 4px"}}>{v}</p>
               <p style={{fontSize:12,color:sub,margin:0}}>{l}</p>
@@ -118,14 +144,14 @@ export default function Admin() {
 
         {/* TABS */}
         <div style={{display:"flex",gap:8,marginBottom:24,flexWrap:"wrap"}}>
-          {([["posts","📰 Posts"],["alpha","⚡ Alpha"],["create","✍️ Write Post"],["create-alpha","🎯 Write Alpha"]] as const).map(([t,label])=>(
+          {([["posts","📰 Posts"],["alpha","⚡ Alpha"],["create","✍️ Write Post"],["create-alpha","🎯 Write Alpha"],["subscribers","📧 Subscribers"]] as const).map(([t,label])=>(
             <button key={t} onClick={()=>setTab(t)} style={{...btn(tab===t?"#34d399":"transparent",tab===t?"#000":sub),border:`1px solid ${border}`}}>
               {label}{t==="posts"&&pendingPosts.length>0?` (${pendingPosts.length})`:t==="alpha"&&pendingAlphas.length>0?` (${pendingAlphas.length})`:""}
             </button>
           ))}
         </div>
 
-        {msg&&<p style={{color:"#34d399",marginBottom:16}}>{msg}</p>}
+        {msg&&<p style={{color:"#34d399",marginBottom:16,fontWeight:600}}>{msg}</p>}
 
         {/* POSTS LIST */}
         {tab==="posts"&&posts.map(p=>(
@@ -216,11 +242,45 @@ export default function Admin() {
               </div>
               {alphaCover&&<img src={alphaCover} style={{marginTop:10,width:"100%",height:150,objectFit:"cover",borderRadius:8}}/>}
             </div>
-            <p style={{fontSize:13,color:sub,marginBottom:8}}>Details (what it is, how to join, rewards, deadline)</p>
+            <p style={{fontSize:13,color:sub,marginBottom:8}}>Details</p>
             <RichEditor value={alphaContent} onChange={setAlphaContent} dark={dark}/>
             <button onClick={createAlpha} style={{...btn("#fbbf24","#000"),marginTop:20,padding:"12px 32px"}}>Publish Alpha</button>
           </div>
         )}
+
+        {/* SUBSCRIBERS */}
+        {tab==="subscribers"&&(
+          <div>
+            {/* SEND NEWSLETTER */}
+            <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:14,padding:24,marginBottom:24,backdropFilter:"blur(8px)"}}>
+              <h3 style={{fontWeight:800,fontSize:16,marginBottom:18}}>📨 Send Newsletter to All Subscribers ({subscribers.length})</h3>
+              <input placeholder="Email subject" value={newsletterSubject} onChange={e=>setNewsletterSubject(e.target.value)} style={inp}/>
+              <textarea placeholder="Email body (HTML supported e.g. <p>Hello!</p> <a href='...'>Link</a>)" value={newsletterBody} onChange={e=>setNewsletterBody(e.target.value)} rows={6} style={{...inp,resize:"vertical"}}/>
+              <button onClick={sendNewsletter} disabled={sending} style={{...btn("#34d399","#000"),padding:"11px 28px"}}>
+                {sending?"Sending...":"📨 Send Newsletter"}
+              </button>
+            </div>
+
+            {/* SUBSCRIBER LIST */}
+            <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:14,padding:24,backdropFilter:"blur(8px)"}}>
+              <h3 style={{fontWeight:800,fontSize:16,marginBottom:18}}>📋 Subscriber List ({subscribers.length})</h3>
+              {subscribers.length===0 ? (
+                <p style={{color:sub}}>No subscribers yet.</p>
+              ) : (
+                subscribers.map(s=>(
+                  <div key={s.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 0",borderBottom:`1px solid ${border}`}}>
+                    <div>
+                      <p style={{fontWeight:600,fontSize:14,margin:"0 0 2px",color:fg}}>{s.email}</p>
+                      <p style={{fontSize:12,color:sub,margin:0}}>{s.date}</p>
+                    </div>
+                    <span style={{fontSize:11,color:"#34d399",fontWeight:700}}>✓ Subscribed</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
     </main>
   );
