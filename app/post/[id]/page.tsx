@@ -44,6 +44,20 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
 
   const inp = { width:"100%", background:"var(--card)", border:"1px solid var(--border)", borderRadius:8, padding:"10px 14px", color:"var(--fg)", fontSize:14, fontFamily:"inherit", outline:"none", boxSizing:"border-box" } as any;
 
+
+  useEffect(() => {
+    if (post) {
+      document.title = post.title + ' | Sanctifi3d Labs';
+      const desc = post.content?.replace(/<[^>]+>/g,'').slice(0,155);
+      let m = document.querySelector('meta[name=description]');
+      if(m) m.setAttribute('content', desc);
+      let og = document.querySelector('meta[property="og:title"]');
+      if(og) og.setAttribute('content', post.title);
+      let ogImg = document.querySelector('meta[property="og:image"]');
+      if(ogImg && post.imageUrl) ogImg.setAttribute('content', post.imageUrl);
+    }
+  }, [post]);
+
   if (!post) return (
     <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1, position:"relative" }}>
       <p style={{ color:"var(--sub)" }}>Loading...</p>
