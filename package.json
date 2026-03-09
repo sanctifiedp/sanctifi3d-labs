@@ -12,8 +12,11 @@
     "@uiw/react-md-editor": "^4.0.11",
     "firebase": "^12.10.0",
     "next": "16.1.6",
+    "node-cron": "^4.2.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "react-quill": "^2.0.0",
+    "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
