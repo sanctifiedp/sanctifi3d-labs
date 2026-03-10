@@ -5,6 +5,20 @@ import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
 
 const cc: Record<string,string> = { Web3:"#34d399", Crypto:"#fbbf24", Design:"#f472b6", "AI Tools":"#38bdf8" };
 
+function Skeleton() {
+  return (
+    <div style={{ background:"var(--card)", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
+      <div style={{ width:"100%", height:170, background:"var(--border)", opacity:.5 }} />
+      <div style={{ padding:"18px 20px" }}>
+        <div style={{ width:60, height:16, borderRadius:999, background:"var(--border)", marginBottom:12 }} />
+        <div style={{ width:"90%", height:14, borderRadius:6, background:"var(--border)", marginBottom:8 }} />
+        <div style={{ width:"70%", height:14, borderRadius:6, background:"var(--border)", marginBottom:16 }} />
+        <div style={{ width:40, height:11, borderRadius:6, background:"var(--border)" }} />
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [cat, setCat] = useState("All");
   const [posts, setPosts] = useState<any[]>([]);
@@ -16,7 +30,10 @@ export default function Home() {
 
   useEffect(() => {
     getDocs(query(collection(db,"posts"), where("status","==","approved"))).then(snap => {
-      setPosts(snap.docs.map(d => ({ id:d.id, ...d.data() })));
+      const sorted = snap.docs
+        .map(d => ({ id:d.id, ...d.data() as any }))
+        .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setPosts(sorted);
       setLoading(false);
     });
   }, []);
@@ -26,11 +43,7 @@ export default function Home() {
     setSubscribing(true);
     try {
       await fetch("/api/subscribe", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ email }) });
-      await addDoc(collection(db,"subscribers"), {
-        email,
-        subscribedAt: new Date().toISOString(),
-        date: new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})
-      });
+      await addDoc(collection(db,"subscribers"), { email, subscribedAt: new Date().toISOString(), date: new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) });
       setDone(true);
     } catch(e) { console.error(e); }
     setSubscribing(false);
@@ -43,7 +56,13 @@ export default function Home() {
 
   return (
     <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", position:"relative", zIndex:1 }}>
-      <style>{`.card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.12)} .card{transition:transform .2s,box-shadow .2s} a{text-decoration:none}`}</style>
+      <style>{`
+        .card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.12); }
+        .card { transition:transform .2s,box-shadow .2s; }
+        a { text-decoration:none; }
+        @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+        .skeleton { animation:pulse 1.5s ease-in-out infinite; }
+      `}</style>
 
       {/* HERO */}
       <section style={{ paddingTop:120, paddingBottom:80, textAlign:"center" }}>
@@ -67,12 +86,18 @@ export default function Home() {
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Search posts..." style={{ flex:1, minWidth:180, borderRadius:999, padding:"9px 18px", fontSize:14, background:"var(--card)", border:"1px solid var(--border)", color:"var(--fg)", fontFamily:"inherit", outline:"none" }} />
         </div>
         <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:28 }}>
-          {["All","Web3","Crypto","Design","AI Tools"].map(c=>(
+          {["All","Web3","Crypto","Design","AI Tools"].map(c => (
             <button key={c} onClick={()=>setCat(c)} style={{ borderRadius:999, padding:"6px 16px", fontSize:13, fontWeight:600, border:"1px solid var(--border)", cursor:"pointer", fontFamily:"inherit", background:cat===c?"#34d399":"transparent", color:cat===c?"#000":"var(--sub)", transition:"all .2s" }}>{c}</button>
           ))}
         </div>
-        {loading ? <p style={{ color:"var(--sub)", textAlign:"center" }}>Loading...</p> :
-        filtered.length===0 ? <p style={{ color:"var(--sub)", textAlign:"center" }}>No posts found.</p> : (
+
+        {loading ? (
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
+            {[...Array(6)].map((_,i) => <div key={i} className="skeleton"><Skeleton /></div>)}
+          </div>
+        ) : filtered.length === 0 ? (
+          <p style={{ color:"var(--sub)", textAlign:"center" }}>No posts found.</p>
+        ) : (
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
             {filtered.map((p:any) => (
               <a key={p.id} href={`/post/${p.id}`} className="card" style={{ background:"var(--card)", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden", display:"block", color:"inherit", backdropFilter:"blur(8px)" }}>
@@ -80,10 +105,10 @@ export default function Home() {
                 <div style={{ padding:"18px 20px" }}>
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
                     <span style={{ fontSize:11, fontWeight:700, borderRadius:999, padding:"3px 10px", background:(cc[p.category]||"#fff")+"22", color:cc[p.category]||"var(--fg)", textTransform:"uppercase" }}>{p.category}</span>
-                    {p.type==="ai"&&<span style={{ fontSize:10, color:"var(--sub)" }}>✦ AI</span>}
+                    {p.type==="ai" && <span style={{ fontSize:10, color:"var(--sub)" }}>✦ AI</span>}
                   </div>
                   <h3 style={{ fontSize:15, fontWeight:800, lineHeight:1.4, marginBottom:8, color:"var(--fg)" }}>{p.title}</h3>
-                  <p style={{ fontSize:13, color:"var(--sub)", lineHeight:1.7, marginBottom:12 }} dangerouslySetInnerHTML={{ __html:p.content?.replace(/<[^>]+>/g,"").slice(0,120)+"..." }} />
+                  <p style={{ fontSize:13, color:"var(--sub)", lineHeight:1.7, marginBottom:12 }} dangerouslySetInnerHTML={{ __html: p.content?.replace(/<[^>]+>/g,"").slice(0,120)+"..." }} />
                   <span style={{ fontSize:12, color:"var(--sub)" }}>{p.date}</span>
                 </div>
               </a>
@@ -100,8 +125,7 @@ export default function Home() {
           <div style={{ color:"#34d399", fontWeight:700, fontSize:18 }}>🎉 Welcome to the lab!</div>
         ) : (
           <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap", maxWidth:420, margin:"0 auto" }}>
-            <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="your@email.com"
-              onKeyDown={e=>e.key==="Enter"&&subscribe()}
+            <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="your@email.com" onKeyDown={e=>e.key==="Enter"&&subscribe()}
               style={{ flex:1, minWidth:180, borderRadius:999, padding:"11px 20px", fontSize:14, background:"var(--card)", border:"1px solid var(--border)", color:"var(--fg)", fontFamily:"inherit", outline:"none" }} />
             <button onClick={subscribe} disabled={subscribing} style={{ background:"#34d399", color:"#000", border:"none", borderRadius:999, padding:"11px 24px", fontSize:14, fontWeight:800, cursor:"pointer" }}>
               {subscribing ? "..." : "Subscribe"}
@@ -117,6 +141,7 @@ export default function Home() {
           <div style={{ display:"flex", gap:20, fontSize:13 }}>
             <a href="https://x.com/Sanctifi3d_1" target="_blank" style={{ color:"var(--sub)" }}>𝕏 Twitter</a>
             <a href="/alpha" style={{ color:"var(--sub)" }}>⚡ Alpha</a>
+            <a href="/about" style={{ color:"var(--sub)" }}>About</a>
             <a href="/legal" style={{ color:"var(--sub)" }}>Legal</a>
             <a href="/admin" style={{ color:"var(--sub)" }}>Admin</a>
           </div>
