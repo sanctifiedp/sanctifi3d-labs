@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "../lib/ThemeContext";
 import Navbar from "../components/Navbar";
 import GlobalShapes from "../components/GlobalShapes";
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           {children}
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
