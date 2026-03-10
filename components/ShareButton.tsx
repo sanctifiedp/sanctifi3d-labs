@@ -166,7 +166,7 @@ export default function ShareButton({ title, excerpt, url, type = "post" }: Prop
             </div>
 
             {/* Native share on mobile */}
-            {typeof navigator !== "undefined" && navigator.share && (
+            {typeof window !== "undefined" && !!(navigator as any).share && (
               <button
                 onClick={nativeShare}
                 style={{
