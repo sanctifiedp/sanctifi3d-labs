@@ -14,9 +14,9 @@ const SUGGESTIONS = [
   "What's hot in Web3 today?",
   "Find me active alpha opportunities",
   "Explain DeFi to a beginner",
-  "What design bounties are available?",
-  "Summarize the latest crypto news",
-  "How do I find airdrops?",
+  "Write me a tweet about the latest post",
+  "Translate the latest news to Pidgin",
+  "I need help with something on the site",
 ];
 
 export default function LabsAI() {
@@ -150,6 +150,10 @@ Rules:
 - Keep responses concise but complete — no walls of text
 - Use line breaks and structure for readability
 - If asked about something outside Web3/crypto/design/AI, briefly answer but redirect to your expertise
+- If user says 'write me a tweet about [post]', write a punchy tweet under 280 chars with relevant hashtags
+- If user says 'translate this' or 'in pidgin/yoruba/igbo/french', translate the last response naturally
+- If user has a complaint or support issue (billing, bugs, broken features), be empathetic and tell them to email adeyigbeminiyi414@gmail.com or DM @Sanctifi3d_1 on X. Acknowledge the issue professionally
+- If user asks 'what can you do', list ALL your capabilities clearly
 - Never make up prices, dates, or facts — say you don't have real-time data if needed
 - Always mention that users can find more at sanctifi3d-labs.vercel.app
 - If asked to write a tweet, write one that's punchy and under 280 chars

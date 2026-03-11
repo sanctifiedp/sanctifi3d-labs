@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { db } from "../lib/firebase";
 import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
+import BookmarkButton from "../components/BookmarkButton";
 
 const cc: Record<string,string> = { Web3:"#34d399", Crypto:"#fbbf24", Design:"#f472b6", "AI Tools":"#38bdf8" };
 
@@ -27,6 +28,7 @@ export default function Home() {
   const [done, setDone] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [views, setViews] = useState<Record<string,number>>({});
 
   useEffect(() => {
     getDocs(query(collection(db,"posts"), where("status","==","approved"))).then(snap => {
@@ -35,6 +37,12 @@ export default function Home() {
         .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       setPosts(sorted);
       setLoading(false);
+      // fetch view counts
+      const { collection: col2, getDocs: gd2 } = await import('firebase/firestore');
+      const vSnap = await gd2(col2(db, 'views'));
+      const vMap: Record<string,number> = {};
+      vSnap.docs.forEach(d => { vMap[d.id] = (d.data().count || 0); });
+      setViews(vMap);
     });
   }, []);
 
@@ -164,7 +172,7 @@ export default function Home() {
                   </div>
                   <h3 style={{ fontSize:15, fontWeight:800, lineHeight:1.4, marginBottom:8, color:"var(--fg)" }}>{p.title}</h3>
                   <p style={{ fontSize:13, color:"var(--sub)", lineHeight:1.7, marginBottom:12 }} dangerouslySetInnerHTML={{ __html: p.content?.replace(/<[^>]+>/g,"").slice(0,120)+"..." }} />
-                  <span style={{ fontSize:12, color:"var(--sub)" }}>{p.date}</span>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:8 }}><span style={{ fontSize:12, color:"var(--sub)" }}>{p.date}</span><BookmarkButton post={p} /></div>
                 </div>
               </a>
             ))}
