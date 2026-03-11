@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { db } from "../lib/firebase";
 import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
+import { readingTime } from "../lib/readingTime";
 import BookmarkButton from "../components/BookmarkButton";
 
 const cc: Record<string,string> = { Web3:"#34d399", Crypto:"#fbbf24", Design:"#f472b6", "AI Tools":"#38bdf8" };
@@ -28,6 +29,8 @@ export default function Home() {
   const [done, setDone] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 9;
   const [views, setViews] = useState<Record<string,number>>({});
 
   useEffect(() => {
@@ -162,7 +165,7 @@ export default function Home() {
           <p style={{ color:"var(--sub)", textAlign:"center" }}>No posts found.</p>
         ) : (
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
-            {filtered.map((p:any) => (
+            {filtered.slice(0, page * PAGE_SIZE).map((p:any) => (
               <a key={p.id} href={`/post/${p.id}`} className="card" style={{ background:"var(--card)", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden", display:"block", color:"inherit", backdropFilter:"blur(8px)" }}>
                 {p.imageUrl && <img src={p.imageUrl} style={{ width:"100%", height:170, objectFit:"cover" }} />}
                 <div style={{ padding:"18px 20px" }}>
@@ -172,7 +175,9 @@ export default function Home() {
                   </div>
                   <h3 style={{ fontSize:15, fontWeight:800, lineHeight:1.4, marginBottom:8, color:"var(--fg)" }}>{p.title}</h3>
                   <p style={{ fontSize:13, color:"var(--sub)", lineHeight:1.7, marginBottom:12 }} dangerouslySetInnerHTML={{ __html: p.content?.replace(/<[^>]+>/g,"").slice(0,120)+"..." }} />
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:8 }}><span style={{ fontSize:12, color:"var(--sub)" }}>{p.date}</span><BookmarkButton post={p} /></div>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:8 }}><span style={{ fontSize:12, color:"var(--sub)" }}>{p.date}</span>
+                    <span style={{ fontSize:11, color:"var(--sub)" }}>· {readingTime(p.content)}</span>
+                    {views[p.id] && <span style={{ fontSize:11, color:"var(--sub)" }}>· {views[p.id]} views</span>}<BookmarkButton post={p} /></div>
                 </div>
               </a>
             ))}
@@ -180,7 +185,14 @@ export default function Home() {
         )}
       </section>
 
-      {/* NEWSLETTER */}
+      {filtered.length > page * PAGE_SIZE && (
+          <div style={{ textAlign:"center", marginTop:32 }}>
+            <button onClick={() => setPage(p => p + 1)} style={{ background:"var(--card)", border:"1px solid var(--border)", borderRadius:999, padding:"12px 36px", fontSize:14, fontWeight:700, color:"var(--fg)", cursor:"pointer", fontFamily:"inherit" }}>
+              Load More ↓
+            </button>
+          </div>
+        )}
+        {/* NEWSLETTER */}
       <section style={{ borderTop:"1px solid var(--border)", padding:"60px 20px", textAlign:"center" }}>
         <h2 style={{ fontSize:"clamp(22px,4vw,36px)", fontWeight:900, marginBottom:10, color:"var(--fg)" }}>Stay ahead of the curve.</h2>
         <p style={{ color:"var(--sub)", fontSize:15, marginBottom:28 }}>Weekly Web3, Crypto and AI updates — no spam.</p>
@@ -207,6 +219,7 @@ export default function Home() {
             <a href="/about" style={{ color:"var(--sub)" }}>About</a>
             <a href="/legal" style={{ color:"var(--sub)" }}>Legal</a>
             <a href="/admin" style={{ color:"var(--sub)" }}>Admin</a>
+            <a href="/widget/embed" style={{ color:"var(--sub)" }}>📡 Widget</a>
           </div>
           <span style={{ fontSize:12, color:"var(--sub)" }}>© 2026 Sanctifi3d Labs</span>
         </div>

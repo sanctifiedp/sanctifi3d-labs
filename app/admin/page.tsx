@@ -221,6 +221,19 @@ export default function Admin() {
   );
 
   // ---- MAIN DASHBOARD ----
+
+  async function bulkApprove(type: 'posts' | 'alpha') {
+    const items = type === 'posts' ? posts : alphaItems;
+    const pending = items.filter((p: any) => p.status === 'pending');
+    if (pending.length === 0) return alert('No pending items.');
+    const col = collection(db, type === 'posts' ? 'posts' : 'alpha');
+    await Promise.all(pending.map((p: any) =>
+      updateDoc(doc(db, type === 'posts' ? 'posts' : 'alpha', p.id), { status: 'approved' })
+    ));
+    if (type === 'posts') setPosts(prev => prev.map((p: any) => ({ ...p, status: p.status === 'pending' ? 'approved' : p.status })));
+    else setAlphaItems(prev => prev.map((p: any) => ({ ...p, status: p.status === 'pending' ? 'approved' : p.status })));
+    alert('All approved!');
+  }
   return (
     <main style={{fontFamily:"system-ui,sans-serif",minHeight:"100vh",position:"relative",zIndex:1}}>
       <div style={{maxWidth:960,margin:"0 auto",padding:"32px 20px"}}>

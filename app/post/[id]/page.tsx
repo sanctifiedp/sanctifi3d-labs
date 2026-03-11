@@ -1,4 +1,5 @@
 "use client";
+import AISummary from "../../../components/AISummary";
 import ViewTracker from "../../../components/ViewTracker";
 import ReadingProgress from "../../../components/ReadingProgress";
 import { useEffect, useState, use } from "react";
