@@ -62,9 +62,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
   }, [post]);
 
   if (!post) return (
-    <ReadingProgress />
-      <ViewTracker postId={id} />
-      <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1, position:"relative" }}>
+    <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1, position:"relative" }}>
       <p style={{ color:"var(--sub)" }}>Loading...</p>
     </main>
   );
