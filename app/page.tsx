@@ -41,11 +41,11 @@ export default function Home() {
       setPosts(sorted);
       setLoading(false);
       // fetch view counts
-      const { collection: col2, getDocs: gd2 } = await import('firebase/firestore');
-      const vSnap = await gd2(col2(db, 'views'));
-      const vMap: Record<string,number> = {};
-      vSnap.docs.forEach(d => { vMap[d.id] = (d.data().count || 0); });
-      setViews(vMap);
+      getDocs(collection(db, 'views')).then(vSnap => {
+        const vMap: Record<string,number> = {};
+        vSnap.docs.forEach(d => { vMap[d.id] = (d.data().count || 0); });
+        setViews(vMap);
+      });
     });
   }, []);
 
