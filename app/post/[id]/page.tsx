@@ -1,4 +1,5 @@
 "use client";
+import ReadingProgress from "../../../components/ReadingProgress";
 import { useEffect, useState, use } from "react";
 import { db } from "../../../lib/firebase";
 import { doc, getDoc, collection, addDoc, getDocs, query, orderBy, where, limit } from "firebase/firestore";
@@ -59,13 +60,15 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
   }, [post]);
 
   if (!post) return (
-    <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1, position:"relative" }}>
+    <ReadingProgress />
+      <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1, position:"relative" }}>
       <p style={{ color:"var(--sub)" }}>Loading...</p>
     </main>
   );
 
   return (
-    <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", position:"relative", zIndex:1 }}>
+    <ReadingProgress />
+      <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", position:"relative", zIndex:1 }}>
       <article style={{ maxWidth:760, margin:"0 auto", padding:"80px 24px 60px" }}>
         {post.imageUrl && <img src={post.imageUrl} style={{ width:"100%", height:320, objectFit:"cover", borderRadius:16, marginBottom:32 }} />}
         <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
