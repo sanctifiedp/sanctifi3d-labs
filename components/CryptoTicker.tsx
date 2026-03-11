@@ -84,7 +84,7 @@ export default function CryptoTicker() {
                 borderRight: "1px solid rgba(255,255,255,.04)"
               }}>
                 <span style={{ fontWeight: 800, color: coin.color }}>{coin.symbol}</span>
-                <span style={{ color: "#fff", fontWeight: 600 }}>
+                <span style={{ color: "#ffffff", fontWeight: 700 }}>
                   ${data?.usd?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
                 <span style={{ color: positive ? "#34d399" : "#f87171", fontSize: 11 }}>

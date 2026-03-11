@@ -66,7 +66,7 @@ export default function Alpha() {
       {selected && (
         <div onClick={()=>setSelected(null)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.7)", zIndex:200, display:"flex", alignItems:"flex-start", justifyContent:"center", padding:"20px", overflowY:"auto", backdropFilter:"blur(6px)" }}>
           <div onClick={e=>e.stopPropagation()} style={{ background:"var(--nav)", border:"1px solid var(--border)", borderRadius:16, maxWidth:680, width:"100%", marginTop:40 }}>
-            {selected.imageUrl && <img src={selected.imageUrl} style={{ width:"100%", height:220, objectFit:"cover", borderRadius:"16px 16px 0 0" }} />}
+            {selected.imageUrl && <img src={selected.imageUrl} alt={selected.title} style={{ width:"100%", height:220, objectFit:"cover", borderRadius:"16px 16px 0 0" }} />}
             <div style={{ padding:"28px 28px 32px" }}>
               <div style={{ display:"flex", gap:8, marginBottom:14, flexWrap:"wrap" }}>
                 <span style={{ fontSize:11, fontWeight:700, borderRadius:999, padding:"3px 10px", background:(tc[selected.type]||"#fff")+"22", color:tc[selected.type]||"var(--fg)", textTransform:"uppercase" }}>{selected.type}</span>
