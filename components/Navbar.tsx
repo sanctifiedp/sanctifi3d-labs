@@ -40,7 +40,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, background:"var(--nav)", borderBottom:"1px solid var(--border)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)" }}>
+      <nav style={{ position:"fixed", top:32, left:0, right:0, zIndex:100, background:"var(--nav)", borderBottom:"1px solid var(--border)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)" }}>
         <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 20px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
 
           {/* LOGO */}

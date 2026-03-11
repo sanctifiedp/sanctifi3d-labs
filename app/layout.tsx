@@ -3,6 +3,7 @@ import { ThemeProvider } from "../lib/ThemeContext";
 import Navbar from "../components/Navbar";
 import GlobalShapes from "../components/GlobalShapes";
 import AdSense from "./adsense";
+import CryptoTicker from "../components/CryptoTicker";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeProvider>
+          <CryptoTicker />
           <GlobalShapes />
           <AdSense />
           <Navbar />

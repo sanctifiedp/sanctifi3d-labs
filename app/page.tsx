@@ -91,6 +91,61 @@ export default function Home() {
           ))}
         </div>
 
+
+        {/* FEATURED + HOT */}
+        {!loading && posts.length > 0 && cat === "All" && !search && (
+          <>
+            {/* FEATURED POST */}
+            {(() => {
+              const featured = posts[0];
+              return (
+                <a href={"/post/" + featured.id} style={{ display:"block", background:"var(--card)", border:"1px solid var(--border)", borderRadius:20, overflow:"hidden", marginBottom:28, textDecoration:"none", color:"inherit", position:"relative" }}
+                  onMouseEnter={e=>(e.currentTarget.style.transform="translateY(-3px)")}
+                  onMouseLeave={e=>(e.currentTarget.style.transform="translateY(0)")}
+                  className="card">
+                  <div style={{ display:"flex", flexDirection:"column" }}>
+                    {featured.imageUrl && <img src={featured.imageUrl} style={{ width:"100%", height:260, objectFit:"cover" }} />}
+                    <div style={{ padding:"24px 28px" }}>
+                      <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:12 }}>
+                        <span style={{ background:"#34d399", color:"#000", fontSize:11, fontWeight:800, borderRadius:999, padding:"3px 12px", letterSpacing:".04em" }}>✦ FEATURED</span>
+                        <span style={{ fontSize:11, color:"var(--sub)", fontWeight:600 }}>{featured.category}</span>
+                        {featured.type==="ai" && <span style={{ fontSize:10, color:"var(--sub)" }}>✦ AI</span>}
+                      </div>
+                      <h2 style={{ fontSize:"clamp(18px,3vw,26px)", fontWeight:900, lineHeight:1.3, marginBottom:10, color:"var(--fg)" }}>{featured.title}</h2>
+                      <p style={{ fontSize:14, color:"var(--sub)", lineHeight:1.7, marginBottom:12 }} dangerouslySetInnerHTML={{ __html: featured.content?.replace(/<[^>]+>/g,"").slice(0,180)+"..." }} />
+                      <span style={{ fontSize:12, color:"var(--sub)" }}>{featured.date}</span>
+                    </div>
+                  </div>
+                </a>
+              );
+            })()}
+
+            {/* HOT RIGHT NOW */}
+            {posts.length > 1 && (
+              <div style={{ marginBottom:28 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:14 }}>
+                  <span style={{ fontSize:18 }}>🔥</span>
+                  <h3 style={{ fontWeight:900, fontSize:16, color:"var(--fg)" }}>Hot Right Now</h3>
+                </div>
+                <div style={{ display:"flex", gap:12, overflowX:"auto", paddingBottom:8 }}>
+                  {posts.slice(1, 5).map((p:any) => (
+                    <a key={p.id} href={"/post/"+p.id} style={{ minWidth:220, maxWidth:220, background:"var(--card)", border:"1px solid var(--border)", borderRadius:14, overflow:"hidden", textDecoration:"none", color:"inherit", flexShrink:0, display:"block" }}
+                      onMouseEnter={e=>(e.currentTarget.style.transform="translateY(-3px)")}
+                      onMouseLeave={e=>(e.currentTarget.style.transform="translateY(0)")}
+                      className="card">
+                      {p.imageUrl && <img src={p.imageUrl} style={{ width:"100%", height:110, objectFit:"cover" }} />}
+                      <div style={{ padding:"12px 14px" }}>
+                        <span style={{ fontSize:10, fontWeight:700, color:"#34d399", letterSpacing:".04em" }}>{p.category}</span>
+                        <p style={{ fontSize:13, fontWeight:700, lineHeight:1.4, marginTop:4, color:"var(--fg)" }}>{p.title?.slice(0,60)}{p.title?.length > 60 ? "..." : ""}</p>
+                        <p style={{ fontSize:11, color:"var(--sub)", marginTop:6 }}>{p.date}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
         {loading ? (
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
             {[...Array(6)].map((_,i) => <div key={i} className="skeleton"><Skeleton /></div>)}
