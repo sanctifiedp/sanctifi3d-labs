@@ -5,6 +5,7 @@ import GlobalShapes from "../components/GlobalShapes";
 import AdSense from "./adsense";
 import CryptoTicker from "../components/CryptoTicker";
 import BackToTop from "../components/BackToTop";
+import LabsAI from "../components/LabsAI";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           {children}
           <BackToTop />
+          <LabsAI />
         </ThemeProvider>
       </body>
     </html>
