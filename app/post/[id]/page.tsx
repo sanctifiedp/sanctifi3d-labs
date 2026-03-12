@@ -69,6 +69,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <>
+    <>
       <ReadingProgress />
       <ViewTracker postId={id} />
       <main style={{ fontFamily:"system-ui,sans-serif", minHeight:"100vh", position:"relative", zIndex:1 }}>
@@ -140,6 +141,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
         </div>
       </article>
     </main>
+    </>
     </>
   );
 }
