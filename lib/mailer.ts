@@ -1,13 +1,6 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://sanctifi3d-labs.vercel.app";
 
 function baseTemplate(content: string, email?: string) {
@@ -27,14 +20,14 @@ function baseTemplate(content: string, email?: string) {
 }
 
 export async function sendWelcomeEmail(email: string) {
-  await transporter.sendMail({
-    from: `"Sanctifi3d Labs" <${process.env.GMAIL_USER}>`,
+  await resend.emails.send({
+    from: "Sanctifi3d Labs <onboarding@resend.dev>",
     to: email,
     subject: "Welcome to Sanctifi3d Labs ✦",
     html: baseTemplate(`
       <h2 style="color:#fff;font-size:22px;font-weight:900;margin:0 0 12px;">Welcome to the Lab ✦</h2>
       <p style="color:#9ca3af;font-size:15px;line-height:1.7;margin:0 0 20px;">You're now subscribed. You'll receive:</p>
-      <div style="margin-bottom:8px;"><span style="color:#34d399;">⚡</span> <span style="color:#d1fae5;font-size:14px;">Hot Web3 & crypto news as it drops</span></div>
+      <div style="margin-bottom:8px;"><span style="color:#34d399;">⚡</span> <span style="color:#d1fae5;font-size:14px;">Hot Web3 & crypto news</span></div>
       <div style="margin-bottom:8px;"><span style="color:#fbbf24;">💎</span> <span style="color:#d1fae5;font-size:14px;">Alpha opportunities — airdrops, bounties, grants</span></div>
       <div style="margin-bottom:8px;"><span style="color:#f472b6;">🎨</span> <span style="color:#d1fae5;font-size:14px;">Design resources and AI tools</span></div>
       <div style="margin-bottom:20px;"><span style="color:#38bdf8;">🤖</span> <span style="color:#d1fae5;font-size:14px;">AI-powered insights</span></div>
@@ -44,8 +37,8 @@ export async function sendWelcomeEmail(email: string) {
 }
 
 export async function sendNotification(email: string, title: string, excerpt: string, link: string, type: string) {
-  await transporter.sendMail({
-    from: `"Sanctifi3d Labs" <${process.env.GMAIL_USER}>`,
+  await resend.emails.send({
+    from: "Sanctifi3d Labs <onboarding@resend.dev>",
     to: email,
     subject: `New ${type === "alpha" ? "Alpha" : "Post"}: ${title}`,
     html: baseTemplate(`
@@ -58,8 +51,8 @@ export async function sendNotification(email: string, title: string, excerpt: st
 }
 
 export async function sendNewsletter(email: string, subject: string, body: string) {
-  await transporter.sendMail({
-    from: `"Sanctifi3d Labs" <${process.env.GMAIL_USER}>`,
+  await resend.emails.send({
+    from: "Sanctifi3d Labs <onboarding@resend.dev>",
     to: email,
     subject,
     html: baseTemplate(`
