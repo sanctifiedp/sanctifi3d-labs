@@ -284,6 +284,9 @@ export default function Admin() {
 
         {/* POSTS LIST */}
         {tab==="posts"&&(
+          <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:12 }}>
+            <button onClick={() => bulkApprove('posts')} style={{ background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", borderRadius:8, padding:"8px 20px", fontSize:13, fontWeight:700, color:"#34d399", cursor:"pointer", fontFamily:"inherit" }}>✓ Bulk Approve Pending</button>
+          </div>
           posts.length===0?<p style={{color:sub}}>No posts yet.</p>:
           posts.map(p=>(
             <div key={p.id} style={{background:cardBg,border:`1px solid ${p.status==="pending"?"rgba(251,191,36,.4)":border}`,borderRadius:12,padding:"14px 18px",marginBottom:10}}>
@@ -309,6 +312,9 @@ export default function Admin() {
 
         {/* ALPHA LIST */}
         {tab==="alpha"&&(
+          <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:12 }}>
+            <button onClick={() => bulkApprove('alpha')} style={{ background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", borderRadius:8, padding:"8px 20px", fontSize:13, fontWeight:700, color:"#34d399", cursor:"pointer", fontFamily:"inherit" }}>✓ Bulk Approve Pending</button>
+          </div>
           alphas.length===0?<p style={{color:sub}}>No alpha posts yet.</p>:
           alphas.map(a=>(
             <div key={a.id} style={{background:cardBg,border:`1px solid ${a.status==="pending"?"rgba(251,191,36,.4)":border}`,borderRadius:12,padding:"14px 18px",marginBottom:10}}>
@@ -385,6 +391,17 @@ export default function Admin() {
         )}
 
         {/* SUBSCRIBERS */}
+        {tab==="siteSettings"&&(
+          <div style={{ maxWidth:480 }}>
+            <h2 style={{ fontWeight:900, fontSize:20, color:"var(--fg)", marginBottom:8 }}>Site Settings</h2>
+            <p style={{ color:"var(--sub)", fontSize:14, marginBottom:28 }}>Upload a logo. It appears as a small circle next to your site name on all pages.</p>
+            <div style={{ background:"var(--card)", border:"1px solid var(--border)", borderRadius:14, padding:24 }}>
+              <h3 style={{ fontWeight:800, fontSize:16, color:"var(--fg)", marginBottom:16 }}>Site Logo</h3>
+              <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadLogo(e.target.files[0])} style={{ display:"block", marginBottom:16, color:"var(--fg)", fontSize:14 }} />
+              <p style={{ fontSize:12, color:"var(--sub)" }}>Recommended: 200x200px square PNG or JPG</p>
+            </div>
+          </div>
+        )}
         {tab==="subscribers"&&(
           <div style={{display:"flex",flexDirection:"column",gap:20}}>
             {/* SEND NEWSLETTER */}

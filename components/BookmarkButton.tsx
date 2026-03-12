@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-export default function BookmarkButton({ post }: { post: any }) {
+export default function BookmarkButton({ post, onRemove }: { post: any, onRemove?: () => void }: { post: any }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {

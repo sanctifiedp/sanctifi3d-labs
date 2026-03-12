@@ -1,4 +1,5 @@
 "use client";
+import PostReactions from "../../../components/PostReactions";
 import AISummary from "../../../components/AISummary";
 import ViewTracker from "../../../components/ViewTracker";
 import ReadingProgress from "../../../components/ReadingProgress";
