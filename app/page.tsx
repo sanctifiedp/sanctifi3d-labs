@@ -116,7 +116,7 @@ export default function Home() {
                   <span style={{ fontSize:11, color:"var(--sub)", fontWeight:600 }}>{posts[0].category}</span>
                 </div>
                 <h2 style={{ fontSize:"clamp(18px,3vw,26px)", fontWeight:900, lineHeight:1.3, marginBottom:10, color:"var(--fg)" }}>{posts[0].title}</h2>
-                <p style={{ fontSize:14, color:"var(--sub)", lineHeight:1.7 }} dangerouslySetInnerHTML={{ __html: posts[0].content?.replace(/<[^>]+>/g,"").slice(0,180)+"..." }} />
+                <p style={{ fontSize:14, color:"var(--sub)", lineHeight:1.7 }} dangerouslySetInnerHTML={{ ___html: posts[0].content?.replace(/<[^>]+>/g,"").slice(0,180)+"..." }} />
               </div>
             </a>
 
@@ -163,7 +163,7 @@ export default function Home() {
                         {p.type==="ai" && <span style={{ fontSize:10, color:"var(--sub)" }}>✦ AI</span>}
                       </div>
                       <h3 style={{ fontSize:15, fontWeight:800, lineHeight:1.4, marginBottom:8, color:"var(--fg)" }}>{p.title}</h3>
-                      <p style={{ fontSize:13, color:"var(--sub)", lineHeight:1.7, marginBottom:12 }} dangerouslySetInnerHTML={{ __html: p.content?.replace(/<[^>]+>/g,"").slice(0,120)+"..." }} />
+                      <p style={{ fontSize:13, color:"var(--sub)", lineHeight:1.7, marginBottom:12 }} dangerouslySetInnerHTML={{ ___html: p.content?.replace(/<[^>]+>/g,"").slice(0,120)+"..." }} />
                     </div>
                   </a>
                   <div style={{ padding:"0 20px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8 }}>
