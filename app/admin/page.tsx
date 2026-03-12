@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { storage } from "../../lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, auth, storage } from "../../lib/firebase";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy } from "firebase/firestore";
+import { collection, setDoc, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useTheme } from "../../lib/ThemeContext";
 import RichEditor from "../../components/RichEditor";
@@ -234,6 +236,20 @@ export default function Admin() {
     else setAlphaItems(prev => prev.map((p: any) => ({ ...p, status: p.status === 'pending' ? 'approved' : p.status })));
     alert('All approved!');
   }
+
+  async function uploadLogo(file: File) {
+    try {
+      const storageRef = ref(storage, "settings/logo");
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      await setDoc(doc(db, "settings", "site"), { logoUrl: url }, { merge: true });
+      alert("Logo updated successfully!");
+    } catch(e) {
+      console.error(e);
+      alert("Failed to upload logo.");
+    }
+  }
+
   return (
     <main style={{fontFamily:"system-ui,sans-serif",minHeight:"100vh",position:"relative",zIndex:1}}>
       <div style={{maxWidth:960,margin:"0 auto",padding:"32px 20px"}}>

@@ -1,4 +1,5 @@
 "use client";
+import SiteLogo from "./SiteLogo";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useTheme } from "../lib/ThemeContext";
@@ -45,7 +46,7 @@ export default function Navbar() {
 
           {/* LOGO */}
           <a href="/" style={{ fontWeight:900, fontSize:17, textDecoration:"none", color:"var(--fg)", letterSpacing:"-.02em" }}>
-            Sanctifi3d<span style={{ color:"#34d399" }}>Labs</span>
+            <SiteLogo />
           </a>
 
           {/* DESKTOP LINKS */}
