@@ -283,7 +283,7 @@ export default function Admin() {
         {msg&&<p style={{color:"#34d399",marginBottom:16,fontWeight:600,fontSize:14}}>{msg}</p>}
 
         {/* POSTS LIST */}
-        {tab==="posts"&&(
+        {tab==="posts"&&(<>
           <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:12 }}>
             <button onClick={() => bulkApprove('posts')} style={{ background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", borderRadius:8, padding:"8px 20px", fontSize:13, fontWeight:700, color:"#34d399", cursor:"pointer", fontFamily:"inherit" }}>✓ Bulk Approve Pending</button>
           </div>
@@ -311,7 +311,7 @@ export default function Admin() {
         )}
 
         {/* ALPHA LIST */}
-        {tab==="alpha"&&(
+        {tab==="alpha"&&(<>
           <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:12 }}>
             <button onClick={() => bulkApprove('alpha')} style={{ background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", borderRadius:8, padding:"8px 20px", fontSize:13, fontWeight:700, color:"#34d399", cursor:"pointer", fontFamily:"inherit" }}>✓ Bulk Approve Pending</button>
           </div>
