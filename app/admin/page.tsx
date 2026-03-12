@@ -283,9 +283,7 @@ export default function Admin() {
         {msg&&<p style={{color:"#34d399",marginBottom:16,fontWeight:600,fontSize:14}}>{msg}</p>}
 
         {/* POSTS LIST */}
-        {tab==="posts"&&(<div>
-            <button onClick={() => bulkApprove('posts')} style={{ background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", borderRadius:8, padding:"8px 20px", fontSize:13, fontWeight:700, color:"#34d399", cursor:"pointer", fontFamily:"inherit" }}>✓ Bulk Approve Pending</button>
-          </div>
+        {tab==="posts"&&(
           posts.length===0?<p style={{color:sub}}>No posts yet.</p>:
           posts.map(p=>(
             <div key={p.id} style={{background:cardBg,border:`1px solid ${p.status==="pending"?"rgba(251,191,36,.4)":border}`,borderRadius:12,padding:"14px 18px",marginBottom:10}}>
@@ -307,12 +305,10 @@ export default function Admin() {
               </div>
             </div>
           ))
-        </div>)}
+        )}
 
         {/* ALPHA LIST */}
-        {tab==="alpha"&&(<div>
-            <button onClick={() => bulkApprove('alpha')} style={{ background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", borderRadius:8, padding:"8px 20px", fontSize:13, fontWeight:700, color:"#34d399", cursor:"pointer", fontFamily:"inherit" }}>✓ Bulk Approve Pending</button>
-          </div>
+        {tab==="alpha"&&(
           alphas.length===0?<p style={{color:sub}}>No alpha posts yet.</p>:
           alphas.map(a=>(
             <div key={a.id} style={{background:cardBg,border:`1px solid ${a.status==="pending"?"rgba(251,191,36,.4)":border}`,borderRadius:12,padding:"14px 18px",marginBottom:10}}>
@@ -334,7 +330,7 @@ export default function Admin() {
               </div>
             </div>
           ))
-        </div>)}
+        )}
 
         {/* CREATE POST */}
         {tab==="create"&&(
