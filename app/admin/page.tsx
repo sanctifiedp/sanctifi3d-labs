@@ -337,12 +337,10 @@ export default function Admin() {
                 </div>
               </div>
             </div>
-          ))
-        )}
-            )}
+            ))
+            }
           </div>
         )}
-
         {/* CREATE POST */}
         {tab==="create"&&(
           <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:14,padding:24}}>
