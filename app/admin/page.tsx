@@ -307,7 +307,10 @@ export default function Admin() {
                 </div>
               </div>
             </div>
-          ))
+            ))
+            }
+          </div>
+        )}
 
         {/* ALPHA LIST */}
         {tab==="alpha"&&(
