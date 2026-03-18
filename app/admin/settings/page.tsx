@@ -18,7 +18,8 @@ export default function AdminSettings() {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    if (sessionStorage.getItem("admin_auth") === "true") {
+    const stored = localStorage.getItem("admin_key");
+    if (stored === ADMIN_KEY) {
       setAuthed(true);
       loadSettings();
     }
@@ -38,7 +39,7 @@ export default function AdminSettings() {
 
   function login() {
     if (key === ADMIN_KEY) {
-      sessionStorage.setItem("admin_auth", "true");
+      localStorage.setItem("admin_key", ADMIN_KEY);
       setAuthed(true);
       loadSettings();
     } else {
@@ -168,7 +169,7 @@ export default function AdminSettings() {
         <div style={{ ...card, border: "1px solid rgba(248,113,113,.2)" }}>
           <h2 style={{ color: "#f87171", fontWeight: 800, fontSize: 18, margin: "0 0 4px" }}>Danger Zone</h2>
           <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 16px" }}>Irreversible actions. Be careful.</p>
-          <button onClick={() => { sessionStorage.removeItem("admin_auth"); window.location.href = "/admin/settings"; }}
+          <button onClick={() => { localStorage.removeItem("admin_key"); window.location.href = "/admin/settings"; }}
             style={btn("rgba(248,113,113,.1)", "#f87171")}>
             Sign Out of Admin
           </button>
