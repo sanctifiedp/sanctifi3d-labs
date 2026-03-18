@@ -7,7 +7,7 @@ export default function Bookmarks() {
 
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+      const saved = JSON.parse(localStorage.getItem("s3d_bookmarks") || "[]");
       setBookmarks(saved);
     } catch { setBookmarks([]); }
   }, []);
