@@ -21,6 +21,8 @@ export default function Admin() {
   const [alphas, setAlphas] = useState<any[]>([]);
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [tab, setTab] = useState<Tab>("posts");
+  const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
+  const [selectedAlphas, setSelectedAlphas] = useState<string[]>([]);
   const [msg, setMsg] = useState("");
   const [uploading, setUploading] = useState(false);
 
@@ -222,6 +224,25 @@ export default function Admin() {
 
   // ---- MAIN DASHBOARD ----
 
+  async function approveSelected(type: "posts" | "alpha") {
+    const ids = type === "posts" ? selectedPosts : selectedAlphas;
+    if (ids.length === 0) return alert("Select items first.");
+    await Promise.all(ids.map(id => updateDoc(doc(db, type === "posts" ? "posts" : "alpha", id), { status: "approved" })));
+    if (type === "posts") { setPosts(p => p.map(x => ids.includes(x.id) ? {...x, status:"approved"} : x)); setSelectedPosts([]); }
+    else { setAlphas(a => a.map(x => ids.includes(x.id) ? {...x, status:"approved"} : x)); setSelectedAlphas([]); }
+    flash("Approved!");
+  }
+
+  async function deleteSelected(type: "posts" | "alpha") {
+    const ids = type === "posts" ? selectedPosts : selectedAlphas;
+    if (ids.length === 0) return alert("Select items first.");
+    if (!confirm(`Delete ${ids.length} items?`)) return;
+    await Promise.all(ids.map(id => deleteDoc(doc(db, type === "posts" ? "posts" : "alpha", id))));
+    if (type === "posts") { setPosts(p => p.filter(x => !ids.includes(x.id))); setSelectedPosts([]); }
+    else { setAlphas(a => a.filter(x => !ids.includes(x.id))); setSelectedAlphas([]); }
+    flash("Deleted!");
+  }
+
   async function bulkApprove(type: 'posts' | 'alpha') {
     const items = type === 'posts' ? posts : alphas;
     const pending = items.filter((p: any) => p.status === 'pending');
@@ -285,11 +306,23 @@ export default function Admin() {
         {/* POSTS LIST */}
         {tab==="posts"&&(
           <div>
-            <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
-              <button onClick={()=>bulkApprove("posts")} style={{...btn("rgba(52,211,153,.12)","#34d399"),border:"1px solid rgba(52,211,153,.3)"}}>✓ Bulk Approve</button>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,flexWrap:"wrap",gap:8}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <input type="checkbox" onChange={e => setSelectedPosts(e.target.checked ? posts.map(p=>p.id) : [])} checked={selectedPosts.length===posts.length && posts.length>0} />
+                <span style={{color:sub,fontSize:13}}>{selectedPosts.length > 0 ? `${selectedPosts.length} selected` : "Select all"}</span>
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                <button onClick={()=>approveSelected("posts")} style={{...btn("rgba(52,211,153,.12)","#34d399"),border:"1px solid rgba(52,211,153,.3)",opacity:selectedPosts.length?1:.4}}>✓ Approve Selected</button>
+                <button onClick={()=>deleteSelected("posts")} style={{...btn("rgba(248,113,113,.12)","#f87171"),border:"1px solid rgba(248,113,113,.3)",opacity:selectedPosts.length?1:.4}}>🗑 Delete Selected</button>
+                <button onClick={()=>bulkApprove("posts")} style={{...btn("rgba(52,211,153,.08)","#34d399"),border:"1px solid rgba(52,211,153,.2)",fontSize:11}}>Approve All</button>
+              </div>
             </div>
             {posts.length===0?<p style={{color:sub}}>No posts yet.</p>:posts.map(p=>(
-            <div key={p.id} style={{background:cardBg,border:`1px solid ${p.status==="pending"?"rgba(251,191,36,.4)":border}`,borderRadius:12,padding:"14px 18px",marginBottom:10}}>
+            <div key={p.id} style={{background:cardBg,border:`1px solid ${selectedPosts.includes(p.id)?"rgba(52,211,153,.5)":p.status==="pending"?"rgba(251,191,36,.4)":border}`,borderRadius:12,padding:"14px 18px",marginBottom:10,cursor:"pointer"}} onClick={()=>setSelectedPosts(s=>s.includes(p.id)?s.filter(x=>x!==p.id):[...s,p.id])}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                  <input type="checkbox" checked={selectedPosts.includes(p.id)} onChange={()=>{}} onClick={e=>e.stopPropagation()} />
+                  <span style={{fontSize:11,color:selectedPosts.includes(p.id)?"#34d399":sub}}>{selectedPosts.includes(p.id)?"Selected":""}</span>
+                </div>
               <div style={{display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
                 <div style={{flex:1}}>
                   <div style={{display:"flex",gap:8,marginBottom:6,flexWrap:"wrap",alignItems:"center"}}>
@@ -315,11 +348,23 @@ export default function Admin() {
         {/* ALPHA LIST */}
         {tab==="alpha"&&(
           <div>
-            <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
-              <button onClick={()=>bulkApprove("alpha")} style={{...btn("rgba(52,211,153,.12)","#34d399"),border:"1px solid rgba(52,211,153,.3)"}}>✓ Bulk Approve</button>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,flexWrap:"wrap",gap:8}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <input type="checkbox" onChange={e => setSelectedAlphas(e.target.checked ? alphas.map(a=>a.id) : [])} checked={selectedAlphas.length===alphas.length && alphas.length>0} />
+                <span style={{color:sub,fontSize:13}}>{selectedAlphas.length > 0 ? `${selectedAlphas.length} selected` : "Select all"}</span>
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                <button onClick={()=>approveSelected("alpha")} style={{...btn("rgba(52,211,153,.12)","#34d399"),border:"1px solid rgba(52,211,153,.3)",opacity:selectedAlphas.length?1:.4}}>✓ Approve Selected</button>
+                <button onClick={()=>deleteSelected("alpha")} style={{...btn("rgba(248,113,113,.12)","#f87171"),border:"1px solid rgba(248,113,113,.3)",opacity:selectedAlphas.length?1:.4}}>🗑 Delete Selected</button>
+                <button onClick={()=>bulkApprove("alpha")} style={{...btn("rgba(52,211,153,.08)","#34d399"),border:"1px solid rgba(52,211,153,.2)",fontSize:11}}>Approve All</button>
+              </div>
             </div>
             {alphas.length===0?<p style={{color:sub}}>No alpha posts yet.</p>:alphas.map(a=>(
-            <div key={a.id} style={{background:cardBg,border:`1px solid ${a.status==="pending"?"rgba(251,191,36,.4)":border}`,borderRadius:12,padding:"14px 18px",marginBottom:10}}>
+            <div key={a.id} style={{background:cardBg,border:`1px solid ${selectedAlphas.includes(a.id)?"rgba(52,211,153,.5)":a.status==="pending"?"rgba(251,191,36,.4)":border}`,borderRadius:12,padding:"14px 18px",marginBottom:10,cursor:"pointer"}} onClick={()=>setSelectedAlphas(s=>s.includes(a.id)?s.filter(x=>x!==a.id):[...s,a.id])}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                  <input type="checkbox" checked={selectedAlphas.includes(a.id)} onChange={()=>{}} onClick={e=>e.stopPropagation()} />
+                  <span style={{fontSize:11,color:selectedAlphas.includes(a.id)?"#34d399":sub}}>{selectedAlphas.includes(a.id)?"Selected":""}</span>
+                </div>
               <div style={{display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
                 <div style={{flex:1}}>
                   <div style={{display:"flex",gap:8,marginBottom:6,flexWrap:"wrap",alignItems:"center"}}>
