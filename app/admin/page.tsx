@@ -1,4 +1,5 @@
 "use client";
+import AdminGuard from "../../components/AdminGuard";
 import { useState, useEffect, useRef } from "react";
 import { db, auth, storage } from "../../lib/firebase";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
@@ -272,6 +273,7 @@ export default function Admin() {
   }
 
   return (
+    <AdminGuard>
     <main style={{fontFamily:"system-ui,sans-serif",minHeight:"100vh",position:"relative",zIndex:1}}>
       <div style={{maxWidth:960,margin:"0 auto",padding:"32px 20px"}}>
 
@@ -487,5 +489,7 @@ export default function Admin() {
 
       </div>
     </main>
+    </AdminGuard>
   );
+
 }

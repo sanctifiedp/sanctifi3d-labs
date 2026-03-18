@@ -1,4 +1,5 @@
 "use client";
+import AdminGuard from "../../../components/AdminGuard";
 import { useState, useEffect } from "react";
 import { db, storage } from "../../../lib/firebase";
 import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
@@ -85,6 +86,7 @@ export default function AdminSettings() {
   );
 
   return (
+    <AdminGuard>
     <main style={{ minHeight: "100vh", background: "#080808", fontFamily: "system-ui,sans-serif", padding: "90px 20px 60px" }}>
       <div style={{ maxWidth: 680, margin: "0 auto" }}>
 
@@ -177,5 +179,5 @@ export default function AdminSettings() {
 
       </div>
     </main>
+    </AdminGuard>
   );
-}
