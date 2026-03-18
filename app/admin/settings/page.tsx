@@ -181,3 +181,4 @@ export default function AdminSettings() {
     </main>
     </AdminGuard>
   );
+}
