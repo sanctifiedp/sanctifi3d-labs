@@ -4,7 +4,7 @@ import { useTheme } from "../lib/ThemeContext";
 import SiteLogo from "./SiteLogo";
 
 export default function Navbar() {
-  const { theme, toggleTheme } = useTheme();
+  const { dark, toggle } = useTheme();
   const [open, setOpen] = useState(false);
 
   const links = [
@@ -33,8 +33,8 @@ export default function Navbar() {
                 {l.label}
               </a>
             ))}
-            <button onClick={toggleTheme} style={{ marginLeft:8, background:"var(--card)", border:"1px solid var(--border)", borderRadius:8, padding:"6px 10px", cursor:"pointer", fontSize:14, color:"var(--fg)" }}>
-              {theme === "dark" ? "☀️" : "🌙"}
+            <button onClick={toggle} style={{ marginLeft:8, background:"var(--card)", border:"1px solid var(--border)", borderRadius:8, padding:"6px 10px", cursor:"pointer", fontSize:14, color:"var(--fg)" }}>
+              {dark ? "☀️" : "🌙"}
             </button>
           </div>
 
@@ -52,8 +52,8 @@ export default function Navbar() {
                 {l.label}
               </a>
             ))}
-            <button onClick={toggleTheme} style={{ background:"var(--card)", border:"1px solid var(--border)", borderRadius:8, padding:"10px 12px", cursor:"pointer", fontSize:14, color:"var(--fg)", textAlign:"left", fontFamily:"inherit", marginTop:4 }}>
-              {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
+            <button onClick={toggle} style={{ background:"var(--card)", border:"1px solid var(--border)", borderRadius:8, padding:"10px 12px", cursor:"pointer", fontSize:14, color:"var(--fg)", textAlign:"left", fontFamily:"inherit", marginTop:4 }}>
+              {dark ? "☀️ Light Mode" : "🌙 Dark Mode"}
             </button>
           </div>
         )}
