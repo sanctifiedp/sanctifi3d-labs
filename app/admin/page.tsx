@@ -305,7 +305,7 @@ export default function Admin() {
               </div>
             </div>
           ))
-        )}
+        </> )}
 
         {/* ALPHA LIST */}
         {tab==="alpha"&&(<>
