@@ -10,7 +10,7 @@ import RichEditor from "../../components/RichEditor";
 const ADMINS = ["adeyigbeminiyi414@gmail.com","adeyigbeminiy414@gmail.com"];
 const ADMIN_KEY = "sanctifi3d_admin_2026";
 
-type Tab = "posts" | "alpha" | "create" | "create-alpha" | "subscribers" | "siteSettings";
+type Tab = "posts" | "alpha" | "create" | "create-alpha" | "subscribers" ;
 
 export default function Admin() {
   const { dark, toggle } = useTheme();
@@ -182,6 +182,7 @@ export default function Admin() {
         {editingPost.imageUrl&&<img src={editingPost.imageUrl} style={{width:"100%",height:140,objectFit:"cover",borderRadius:8,marginBottom:10}}/>}
         <p style={{fontSize:13,color:sub,marginBottom:8}}>Content</p>
         <RichEditor value={editingPost.content||""} onChange={v=>setEditingPost({...editingPost,content:v})} dark={dark}/>
+        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}><a href="/admin/settings" style={{background:"#1a1a1a",border:"1px solid #2a2a2a",borderRadius:8,padding:"8px 16px",fontSize:13,color:"#9ca3af",textDecoration:"none",fontWeight:600}}>⚙ Settings →</a></div>
         {msg&&<p style={{color:"#34d399",marginTop:12,fontWeight:600}}>{msg}</p>}
         <div style={{display:"flex",gap:12,marginTop:20}}>
           <button onClick={saveEditPost} style={btn("#34d399","#000",{padding:"12px 32px"})}>Save Changes</button>
@@ -213,6 +214,7 @@ export default function Admin() {
         {editingAlpha.imageUrl&&<img src={editingAlpha.imageUrl} style={{width:"100%",height:140,objectFit:"cover",borderRadius:8,marginBottom:10}}/>}
         <p style={{fontSize:13,color:sub,marginBottom:8}}>Content</p>
         <RichEditor value={editingAlpha.content||""} onChange={v=>setEditingAlpha({...editingAlpha,content:v})} dark={dark}/>
+        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}><a href="/admin/settings" style={{background:"#1a1a1a",border:"1px solid #2a2a2a",borderRadius:8,padding:"8px 16px",fontSize:13,color:"#9ca3af",textDecoration:"none",fontWeight:600}}>⚙ Settings →</a></div>
         {msg&&<p style={{color:"#34d399",marginTop:12,fontWeight:600}}>{msg}</p>}
         <div style={{display:"flex",gap:12,marginTop:20}}>
           <button onClick={saveEditAlpha} style={btn("#fbbf24","#000",{padding:"12px 32px"})}>Save Changes</button>
@@ -301,6 +303,7 @@ export default function Admin() {
           ))}
         </div>
 
+        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}><a href="/admin/settings" style={{background:"#1a1a1a",border:"1px solid #2a2a2a",borderRadius:8,padding:"8px 16px",fontSize:13,color:"#9ca3af",textDecoration:"none",fontWeight:600}}>⚙ Settings →</a></div>
         {msg&&<p style={{color:"#34d399",marginBottom:16,fontWeight:600,fontSize:14}}>{msg}</p>}
 
         {/* POSTS LIST */}
@@ -439,7 +442,7 @@ export default function Admin() {
         )}
 
         {/* SUBSCRIBERS */}
-        {tab==="siteSettings"&&(
+        {false&&(
           <div style={{ maxWidth:480 }}>
             <h2 style={{ fontWeight:900, fontSize:20, color:"var(--fg)", marginBottom:8 }}>Site Settings</h2>
             <p style={{ color:"var(--sub)", fontSize:14, marginBottom:28 }}>Upload a logo. It appears as a small circle next to your site name on all pages.</p>

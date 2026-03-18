@@ -289,7 +289,7 @@ export default function Home() {
             <a href="/feed.xml" style={{ color:"var(--sub)" }}>📡 RSS</a>
             <a href="/widget/embed" style={{ color:"var(--sub)" }}>Widget</a>
             <a href="/legal" style={{ color:"var(--sub)" }}>Legal</a>
-            <a href="/admin" style={{ color:"var(--sub)" }}>Admin</a>
+            
           </div>
           <span style={{ fontSize:12, color:"var(--sub)" }}>© 2026 Sanctifi3d Labs</span>
         </div>
