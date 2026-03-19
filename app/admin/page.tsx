@@ -5,7 +5,6 @@ import { db, auth, storage } from "../../lib/firebase";
 import { collection, setDoc, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy, where } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useTheme } from "../../lib/ThemeContext";
-import RichEditor from "../../components/RichEditor";
 import RichPostEditor from "../../components/RichPostEditor";
 
 const ADMINS = ["adeyigbeminiyi414@gmail.com","adeyigbeminiy414@gmail.com"];
@@ -460,7 +459,7 @@ export default function Admin() {
               {coverUrl&&<img src={coverUrl} style={{marginTop:10,width:"100%",height:150,objectFit:"cover",borderRadius:8}}/>}
             </div>
             <p style={{fontSize:13,color:sub,marginBottom:8}}>Content</p>
-            <RichEditor value={content} onChange={setContent} dark={dark}/>
+            <RichPostEditor content={content} onChange={setContent} minHeight={280} />
             <button onClick={createPost} style={{...btn("#34d399","#000"),marginTop:20,padding:"12px 32px",fontSize:15}}>Publish Post</button>
           </div>
         )}
@@ -489,7 +488,7 @@ export default function Admin() {
               {alphaCover&&<img src={alphaCover} style={{marginTop:10,width:"100%",height:150,objectFit:"cover",borderRadius:8}}/>}
             </div>
             <p style={{fontSize:13,color:sub,marginBottom:8}}>Details</p>
-            <RichEditor value={alphaContent} onChange={setAlphaContent} dark={dark}/>
+            <RichPostEditor content={alphaContent} onChange={setAlphaContent} minHeight={280} />
             <button onClick={createAlpha} style={{...btn("#fbbf24","#000"),marginTop:20,padding:"12px 32px",fontSize:15}}>Publish Alpha</button>
           </div>
         )}
@@ -616,7 +615,7 @@ export default function Admin() {
               <p style={{fontSize:13,color:sub,marginBottom:18}}>Will be sent to all {subscribers.length} subscribers</p>
               <input placeholder="Subject line" value={nlSubject} onChange={e=>setNlSubject(e.target.value)} style={inp}/>
               <p style={{fontSize:13,color:sub,marginBottom:8}}>Body (HTML supported)</p>
-              <RichEditor value={nlBody} onChange={setNlBody} dark={dark}/>
+              <RichPostEditor content={nlBody} onChange={setNlBody} minHeight={200} placeholder="Write your newsletter content..." />
               <button onClick={sendNewsletter} disabled={sending} style={{...btn("#34d399","#000"),marginTop:16,padding:"11px 28px"}}>
                 {sending?"Sending...":"📨 Send to All Subscribers"}
               </button>
