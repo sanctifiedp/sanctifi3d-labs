@@ -1,4 +1,5 @@
 "use client";
+import { createNotification } from "../../lib/notifications";
 import AdminGuard from "../../components/AdminGuard";
 import { useState, useEffect, useRef } from "react";
 import { db, auth, storage } from "../../lib/firebase";
@@ -95,6 +96,7 @@ export default function Admin() {
       });
     }
     flash("Submission approved and published!");
+    createNotification({ uid:sub.uid, type:"post_approved", title:"Your submission was approved! 🎉", message:`"${sub.title}" is now live on Sanctifi3d Labs`, link:`/post/${ref.id}` }).catch(()=>{});
   }
 
   async function rejectSubmission(id: string, note: string) {
@@ -110,6 +112,7 @@ export default function Admin() {
       });
     }
     flash("Submission rejected.");
+    if (sub?.uid) createNotification({ uid:sub.uid, type:"post_rejected", title:"Submission update", message:`Your submission "${sub?.title}" was not approved this time`, link:"/submit" }).catch(()=>{});
   }
 
   async function fetchAnalytics() {

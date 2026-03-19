@@ -1,4 +1,5 @@
 "use client";
+import { createNotification } from "../../../lib/notifications";
 import PostReactions from "../../../components/PostReactions";
 import AISummary from "../../../components/AISummary";
 import ViewTracker from "../../../components/ViewTracker";

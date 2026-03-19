@@ -12,9 +12,10 @@ export default function Profile() {
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"submissions"|"bookmarks"|"topics">("submissions");
+  const [activeTab, setActiveTab] = useState<"submissions"|"bookmarks"|"topics"|"notifications">("submissions");
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [msg, setMsg] = useState("");
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [followedTopics, setFollowedTopics] = useState<string[]>([]);
   const TOPICS = ["Web3","Crypto","DeFi","NFT","Design","AI Tools","Airdrop","Bounty","Grant"];
 
@@ -24,6 +25,7 @@ export default function Profile() {
       loadSubmissions();
       loadBookmarks();
       loadTopics();
+      loadNotifications();
     }
   }, [user, loading]);
 
@@ -59,6 +61,12 @@ export default function Profile() {
     const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     data.sort((a:any,b:any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     setSubmissions(data);
+  }
+
+  async function loadNotifications() {
+    const { collection: col, query: q, where: w, getDocs: gd, orderBy: ob, limit: lim } = await import("firebase/firestore");
+    const snap = await gd(q(col(db,"notifications"), w("uid","==",user!.uid), ob("createdAt","desc"), lim(20)));
+    setNotifications(snap.docs.map(d=>({id:d.id,...d.data()})));
   }
 
   async function loadTopics() {
@@ -199,7 +207,7 @@ export default function Profile() {
 
         {/* Tabs */}
         <div style={{ display:"flex", gap:8, marginBottom:20 }}>
-          {(["submissions","bookmarks","topics"] as const).map(t => (
+          {(["submissions","bookmarks","topics","notifications"] as const).map(t => (
             <button key={t} onClick={()=>setActiveTab(t)} style={{ background:activeTab===t?"#34d399":"transparent", color:activeTab===t?"#000":"var(--sub)", border:"1px solid var(--border)", borderRadius:999, padding:"7px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", textTransform:"capitalize" }}>
               {t}
             </button>
@@ -228,6 +236,30 @@ export default function Profile() {
                 {s.status === "approved" && s.publishedId && (
                   <a href={`/post/${s.publishedId}`} style={{ fontSize:12, color:"#34d399", fontWeight:700, textDecoration:"none", whiteSpace:"nowrap" }}>View Post →</a>
                 )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Notifications */}
+        {activeTab === "notifications" && (
+          <div>
+            {notifications.length === 0 ? (
+              <div style={{ textAlign:"center", padding:"40px 0" }}>
+                <p style={{ fontSize:40, marginBottom:12 }}>🔔</p>
+                <p style={{ color:"var(--sub)" }}>No notifications yet.</p>
+              </div>
+            ) : notifications.map((n:any) => (
+              <div key={n.id} onClick={()=>n.link&&(window.location.href=n.link)} style={{ display:"flex", gap:12, padding:"14px 16px", background:"var(--card)", border:`1px solid ${n.read?"var(--border)":"rgba(52,211,153,.2)"}`, borderRadius:12, marginBottom:10, cursor:n.link?"pointer":"default", transition:"all .15s" }}>
+                <div style={{ width:40, height:40, borderRadius:"50%", background:"rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
+                  {n.type==="post_approved"?"✅":n.type==="post_rejected"?"❌":n.type==="comment_reply"?"💬":"🔔"}
+                </div>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:14, fontWeight:700, color:"var(--fg)", margin:"0 0 4px" }}>{n.title}</p>
+                  <p style={{ fontSize:13, color:"var(--sub)", margin:"0 0 4px", lineHeight:1.5 }}>{n.message}</p>
+                  <p style={{ fontSize:11, color:"var(--sub)", margin:0 }}>{new Date(n.createdAt).toLocaleDateString()}</p>
+                </div>
+                {!n.read && <div style={{ width:8, height:8, borderRadius:"50%", background:"#34d399", flexShrink:0, marginTop:4 }} />}
               </div>
             ))}
           </div>
