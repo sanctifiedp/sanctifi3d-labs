@@ -2,7 +2,6 @@
 import AdminGuard from "../../components/AdminGuard";
 import { useState, useEffect, useRef } from "react";
 import { db, auth, storage } from "../../lib/firebase";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { collection, setDoc, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy, where } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useTheme } from "../../lib/ThemeContext";
@@ -15,9 +14,6 @@ type Tab = "posts" | "alpha" | "create" | "create-alpha" | "subscribers" | "anal
 
 export default function Admin() {
   const { dark, toggle } = useTheme();
-  const [user, setUser] = useState<any>(null);
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPass, setLoginPass] = useState("");
   const [posts, setPosts] = useState<any[]>([]);
   const [alphas, setAlphas] = useState<any[]>([]);
   const [subscribers, setSubscribers] = useState<any[]>([]);
@@ -106,10 +102,7 @@ export default function Admin() {
 
   function flash(m:string) { setMsg(m); setTimeout(()=>setMsg(""),4000); }
 
-  async function login() {
-    try { const u = await signInWithEmailAndPassword(auth,loginEmail,loginPass); setUser(u.user); }
-    catch(e:any) { flash("❌ "+e.message); }
-  }
+  
 
   async function approve(item:any, col:string) {
     await updateDoc(doc(db,col,item.id),{status:"approved"});
@@ -187,18 +180,7 @@ export default function Admin() {
   }
 
   // ---- LOGIN SCREEN ----
-  if(!user) return (
-    <main style={{fontFamily:"system-ui,sans-serif",minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",zIndex:1}}>
-      <div style={{width:"100%",maxWidth:360,padding:24,background:cardBg,borderRadius:16,border:`1px solid ${border}`}}>
-        <h2 style={{fontWeight:800,fontSize:22,marginBottom:6,color:fg}}>Admin Login</h2>
-        <p style={{color:sub,fontSize:13,marginBottom:24}}>Sanctifi3d Labs</p>
-        {msg&&<p style={{color:"#f87171",fontSize:13,marginBottom:12}}>{msg}</p>}
-        <input placeholder="Email" value={loginEmail} onChange={e=>setLoginEmail(e.target.value)} style={inp}/>
-        <input placeholder="Password" type="password" value={loginPass} onChange={e=>setLoginPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()} style={inp}/>
-        <button onClick={login} style={{...btn("#34d399","#000"),width:"100%",padding:12,fontSize:15}}>Login →</button>
-      </div>
-    </main>
-  );
+  
 
   const pending = posts.filter(p=>p.status==="pending");
   const pendingA = alphas.filter(a=>a.status==="pending");
