@@ -1,3 +1,4 @@
+import PWARegister from "../components/PWARegister";
 import type { Metadata } from "next";
 import { ThemeProvider } from "../lib/ThemeContext";
 import Navbar from "../components/Navbar";
@@ -34,7 +35,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="google-adsense-account" content="ca-pub-2613718694144871" />
         <meta name="google-site-verification" content="gzTbfqeoulhdJOI_6g0Keb5X-5tAaVLfXwJ5B47572c" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="S3D Labs" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="theme-color" content="#34d399" />
       </head>
+      <PWARegister />
       <body>
         <ThemeProvider>
           <CryptoTicker />

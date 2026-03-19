@@ -1,0 +1,37 @@
+{
+  "name": "Sanctifi3d Labs",
+  "short_name": "S3D Labs",
+  "description": "AI-Powered Web3, Crypto, Design & AI Intelligence",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#34d399",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["news", "finance", "education"],
+  "shortcuts": [
+    {
+      "name": "Alpha",
+      "url": "/alpha",
+      "description": "View alpha opportunities"
+    },
+    {
+      "name": "Bookmarks",
+      "url": "/bookmarks",
+      "description": "Your saved posts"
+    }
+  ]
+}
