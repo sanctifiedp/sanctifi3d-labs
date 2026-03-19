@@ -12,8 +12,23 @@ export default function Submit() {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("Web3");
   const [sourceUrl, setSourceUrl] = useState("");
+  const [coverImage, setCoverImage] = useState("");
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  async function uploadCover(file: File) {
+    setUploadingCover(true);
+    try {
+      const { ref: sRef, uploadBytes, getDownloadURL } = await import("firebase/storage");
+      const { storage } = await import("../../lib/firebase");
+      const storageRef = sRef(storage, `covers/${Date.now()}-${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setCoverImage(url);
+    } catch(e) { alert("Cover upload failed."); }
+    setUploadingCover(false);
+  }
 
   async function submit() {
     if (!title.trim() || !content.trim()) return;
@@ -29,6 +44,7 @@ export default function Submit() {
         content: content.trim(),
         category,
         sourceUrl: sourceUrl.trim(),
+        imageUrl: coverImage,
         status: "pending",
         createdAt: new Date().toISOString(),
         date: new Date().toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" }),
@@ -94,6 +110,26 @@ export default function Submit() {
         </div>
 
         <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+          {/* Cover Image */}
+          <div>
+            <label style={{ display:"block", fontSize:12, fontWeight:700, color:"var(--sub)", marginBottom:8, textTransform:"uppercase", letterSpacing:".05em" }}>Cover Image</label>
+            {coverImage ? (
+              <div style={{ position:"relative", borderRadius:12, overflow:"hidden", marginBottom:8 }}>
+                <img src={coverImage} alt="Cover" style={{ width:"100%", height:220, objectFit:"cover", display:"block" }} />
+                <button onClick={()=>setCoverImage("")} style={{ position:"absolute", top:10, right:10, background:"rgba(0,0,0,.7)", color:"#fff", border:"none", borderRadius:8, padding:"6px 12px", fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>✕ Remove</button>
+              </div>
+            ) : (
+              <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:160, border:"2px dashed var(--border)", borderRadius:12, cursor:"pointer", gap:8, background:"rgba(255,255,255,.02)", transition:"all .2s" }}
+                onMouseEnter={e=>(e.currentTarget.style.borderColor="#34d399")}
+                onMouseLeave={e=>(e.currentTarget.style.borderColor="var(--border)")}>
+                <span style={{ fontSize:32 }}>{uploadingCover ? "⏳" : "🖼️"}</span>
+                <span style={{ fontSize:13, color:"var(--sub)", fontWeight:600 }}>{uploadingCover ? "Uploading..." : "Click to upload cover image"}</span>
+                <span style={{ fontSize:11, color:"var(--sub)" }}>JPG, PNG, WebP — recommended 1200×630px</span>
+                <input type="file" accept="image/*" style={{ display:"none" }} onChange={e=>e.target.files?.[0]&&uploadCover(e.target.files[0])} disabled={uploadingCover} />
+              </label>
+            )}
+          </div>
+
           {/* Title */}
           <div>
             <label style={{ display:"block", fontSize:12, fontWeight:700, color:"var(--sub)", marginBottom:8, textTransform:"uppercase", letterSpacing:".05em" }}>Title *</label>
