@@ -5,7 +5,7 @@ import ViewTracker from "../../../components/ViewTracker";
 import ReadingProgress from "../../../components/ReadingProgress";
 import { useEffect, useState, use } from "react";
 import { db } from "../../../lib/firebase";
-import { doc, getDoc, collection, addDoc, getDocs, query, orderBy, where, limit } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment, collection, addDoc, getDocs, query, orderBy, where, limit } from "firebase/firestore";
 
 const cc: Record<string,string> = { Web3:"#34d399", Crypto:"#fbbf24", Design:"#f472b6", "AI Tools":"#38bdf8" };
 
@@ -13,6 +13,8 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [post, setPost] = useState<any>(null);
   const [comments, setComments] = useState<any[]>([]);
+  const [commentLikes, setCommentLikes] = useState<Record<string,{up:number,down:number}>>({});
+  const [myVotes, setMyVotes] = useState<Record<string,string>>({});
   const [related, setRelated] = useState<any[]>([]);
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
@@ -24,6 +26,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
       if (d.exists()) { const data = {id:d.id,...d.data()} as any; setPost(data); fetchRelated(data.category,d.id); }
     });
     fetchComments();
+    try { setMyVotes(JSON.parse(localStorage.getItem("comment_votes_"+id)||"{}")); } catch{}
   }, [id]);
 
   async function fetchRelated(category:string, currentId:string) {
@@ -67,6 +70,16 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
       <p style={{ color:"var(--sub)" }}>Loading...</p>
     </main>
   );
+
+  async function voteComment(commentId: string, type: "up"|"down") {
+    if (myVotes[commentId]) return;
+    const ref = doc(db, "posts", id, "comments", commentId);
+    await updateDoc(ref, { [type]: increment(1) });
+    setCommentLikes(l => ({ ...l, [commentId]: { up:(l[commentId]?.up||0)+(type==="up"?1:0), down:(l[commentId]?.down||0)+(type==="down"?1:0) } }));
+    const updated = { ...myVotes, [commentId]: type };
+    setMyVotes(updated);
+    localStorage.setItem("comment_votes_"+id, JSON.stringify(updated));
+  }
 
   return (
     <>
