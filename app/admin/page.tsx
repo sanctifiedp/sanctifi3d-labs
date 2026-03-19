@@ -21,6 +21,7 @@ export default function Admin() {
   const [posts, setPosts] = useState<any[]>([]);
   const [alphas, setAlphas] = useState<any[]>([]);
   const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<{totalViews:number, topPosts:any[], recentSubs:any[], subsByDay:any[], viewsByPost:any[]}>({totalViews:0, topPosts:[], recentSubs:[], subsByDay:[], viewsByPost:[]});
   const [tab, setTab] = useState<Tab>("posts");
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
   const [selectedAlphas, setSelectedAlphas] = useState<string[]>([]);
@@ -66,6 +67,41 @@ export default function Admin() {
   async function fetchAll() { await Promise.all([fetchPosts(), fetchAlphas(), fetchSubs()]); }
   async function fetchPosts() { const s = await getDocs(query(collection(db,"posts"),orderBy("createdAt","desc"))); setPosts(s.docs.map(d=>({id:d.id,...d.data()}))); }
   async function fetchAlphas() { const s = await getDocs(query(collection(db,"alpha"),orderBy("createdAt","desc"))); setAlphas(s.docs.map(d=>({id:d.id,...d.data()}))); }
+  async function fetchAnalytics() {
+    // Get views
+    const viewsSnap = await getDocs(collection(db, "views"));
+    const viewsByPost: any[] = [];
+    let totalViews = 0;
+    viewsSnap.docs.forEach(d => {
+      totalViews += d.data().count || 0;
+      viewsByPost.push({ id: d.id, count: d.data().count || 0 });
+    });
+    viewsByPost.sort((a,b) => b.count - a.count);
+
+    // Get top posts with titles
+    const postsSnap = await getDocs(query(collection(db, "posts"), where("status","==","approved")));
+    const postMap: Record<string,string> = {};
+    postsSnap.docs.forEach(d => { postMap[d.id] = (d.data() as any).title || "Untitled"; });
+    const topPosts = viewsByPost.slice(0,5).map(v => ({ ...v, title: postMap[v.id] || "Unknown" }));
+
+    // Get subscribers by day (last 7 days)
+    const subsSnap = await getDocs(collection(db, "subscribers"));
+    const allSubs = subsSnap.docs.map(d => d.data());
+    const recentSubs = allSubs.slice(-5).reverse();
+
+    // Group subs by day
+    const dayMap: Record<string,number> = {};
+    allSubs.forEach((s:any) => {
+      if (s.subscribedAt) {
+        const day = s.subscribedAt.slice(0,10);
+        dayMap[day] = (dayMap[day]||0) + 1;
+      }
+    });
+    const subsByDay = Object.entries(dayMap).sort((a,b)=>a[0].localeCompare(b[0])).slice(-7).map(([date,count])=>({date,count}));
+
+    setAnalytics({ totalViews, topPosts, recentSubs, subsByDay, viewsByPost });
+  }
+
   async function fetchSubs() { const s = await getDocs(query(collection(db,"subscribers"),orderBy("subscribedAt","desc"))); setSubscribers(s.docs.map(d=>({id:d.id,...d.data()}))); }
 
   function flash(m:string) { setMsg(m); setTimeout(()=>setMsg(""),4000); }
@@ -452,6 +488,77 @@ export default function Admin() {
               <h3 style={{ fontWeight:800, fontSize:16, color:"var(--fg)", marginBottom:16 }}>Site Logo</h3>
               <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadLogo(e.target.files[0])} style={{ display:"block", marginBottom:16, color:"var(--fg)", fontSize:14 }} />
               <p style={{ fontSize:12, color:"var(--sub)" }}>Recommended: 200x200px square PNG or JPG</p>
+            </div>
+          </div>
+        )}
+        {tab==="analytics"&&(
+          <div>
+            {/* Summary Cards */}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:12,marginBottom:24}}>
+              {[
+                {label:"Total Views",value:analytics.totalViews,color:"#34d399",icon:"👁"},
+                {label:"Total Posts",value:posts.length,color:"#38bdf8",icon:"📝"},
+                {label:"Subscribers",value:subscribers.length,color:"#a78bfa",icon:"📧"},
+                {label:"Alpha Posts",value:alphas.length,color:"#fbbf24",icon:"⚡"},
+              ].map(s=>(
+                <div key={s.label} style={{background:cardBg,border:`1px solid ${border}`,borderRadius:12,padding:"16px"}}>
+                  <div style={{fontSize:20,marginBottom:6}}>{s.icon}</div>
+                  <div style={{fontSize:24,fontWeight:900,color:s.color}}>{s.value}</div>
+                  <div style={{fontSize:11,color:sub,fontWeight:700,letterSpacing:".04em",textTransform:"uppercase",marginTop:4}}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Top Posts by Views */}
+            <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:14,padding:20,marginBottom:16}}>
+              <h3 style={{fontWeight:800,fontSize:16,color:fg,margin:"0 0 16px"}}>🔥 Top Posts by Views</h3>
+              {analytics.topPosts.length===0?<p style={{color:sub,fontSize:13}}>No view data yet.</p>:analytics.topPosts.map((p,i)=>(
+                <div key={p.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:`1px solid ${border}`}}>
+                  <span style={{fontSize:18,fontWeight:900,color:sub,minWidth:24}}>#{i+1}</span>
+                  <div style={{flex:1}}>
+                    <p style={{fontSize:13,fontWeight:700,color:fg,margin:"0 0 2px"}}>{p.title}</p>
+                    <div style={{height:6,background:"rgba(255,255,255,.06)",borderRadius:999,overflow:"hidden",width:"100%"}}>
+                      <div style={{height:"100%",background:"#34d399",borderRadius:999,width:`${Math.min(100,Math.round((p.count/(analytics.topPosts[0]?.count||1))*100))}%`,transition:"width .5s"}} />
+                    </div>
+                  </div>
+                  <span style={{fontSize:13,fontWeight:800,color:"#34d399",minWidth:60,textAlign:"right"}}>{p.count} views</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Subscriber Growth */}
+            <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:14,padding:20,marginBottom:16}}>
+              <h3 style={{fontWeight:800,fontSize:16,color:fg,margin:"0 0 16px"}}>📈 Subscriber Growth (Last 7 Days)</h3>
+              {analytics.subsByDay.length===0?<p style={{color:sub,fontSize:13}}>No subscriber data yet.</p>:(
+                <div style={{display:"flex",alignItems:"flex-end",gap:8,height:80}}>
+                  {analytics.subsByDay.map((d,i)=>{
+                    const max = Math.max(...analytics.subsByDay.map(x=>x.count),1);
+                    const h = Math.max(8,Math.round((d.count/max)*72));
+                    return (
+                      <div key={d.date} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                        <span style={{fontSize:10,color:"#34d399",fontWeight:700}}>{d.count}</span>
+                        <div style={{width:"100%",height:h,background:"#34d399",borderRadius:4,opacity:.8}} />
+                        <span style={{fontSize:9,color:sub}}>{d.date.slice(5)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Recent Subscribers */}
+            <div style={{background:cardBg,border:`1px solid ${border}`,borderRadius:14,padding:20}}>
+              <h3 style={{fontWeight:800,fontSize:16,color:fg,margin:"0 0 16px"}}>👥 Recent Subscribers</h3>
+              {analytics.recentSubs.length===0?<p style={{color:sub,fontSize:13}}>No subscribers yet.</p>:analytics.recentSubs.map((s:any,i:number)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:`1px solid ${border}`}}>
+                  <span style={{fontSize:13,color:fg,fontWeight:600}}>{s.email}</span>
+                  <span style={{fontSize:11,color:sub}}>{s.date||s.subscribedAt?.slice(0,10)}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{marginTop:16,textAlign:"right"}}>
+              <button onClick={fetchAnalytics} style={{...btn("rgba(52,211,153,.1)","#34d399"),border:"1px solid rgba(52,211,153,.3)"}}>↻ Refresh</button>
             </div>
           </div>
         )}
