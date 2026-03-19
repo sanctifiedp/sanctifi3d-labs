@@ -3,7 +3,7 @@ import AdminGuard from "../../components/AdminGuard";
 import { useState, useEffect, useRef } from "react";
 import { db, auth, storage } from "../../lib/firebase";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { collection, setDoc, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy } from "firebase/firestore";
+import { collection, setDoc, getDocs, addDoc, deleteDoc, updateDoc, doc, query, orderBy, where } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useTheme } from "../../lib/ThemeContext";
 import RichEditor from "../../components/RichEditor";
