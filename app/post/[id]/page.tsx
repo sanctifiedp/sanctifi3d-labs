@@ -38,7 +38,11 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
   async function fetchComments() {
     const q = query(collection(db,"posts",id,"comments"),orderBy("createdAt","asc"));
     const snap = await getDocs(q);
-    setComments(snap.docs.map(d=>({id:d.id,...d.data()})));
+    const fetched = snap.docs.map(d=>({id:d.id,...d.data()}));
+      setComments(fetched);
+      const likes: Record<string,{up:number,down:number}> = {};
+      fetched.forEach((c:any) => { likes[c.id] = { up: c.up||0, down: c.down||0 }; });
+      setCommentLikes(likes);
   }
 
   async function submitComment() {

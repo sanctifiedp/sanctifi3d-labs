@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { db } from "../lib/firebase";
 import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
 import { readingTime } from "../lib/readingTime";
@@ -22,11 +23,12 @@ function Skeleton() {
   );
 }
 
-export default function Home() {
+function HomeInner() {
   const [cat, setCat] = useState("All");
   const [posts, setPosts] = useState<any[]>([]);
   const [views, setViews] = useState<Record<string,number>>({});
-  const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
@@ -296,4 +298,9 @@ export default function Home() {
       </footer>
     </main>
   );
+}
+
+import { Suspense } from "react";
+export default function Home() {
+  return <Suspense fallback={null}><HomeInner /></Suspense>;
 }
