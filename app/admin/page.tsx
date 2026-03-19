@@ -10,13 +10,14 @@ import RichEditor from "../../components/RichEditor";
 const ADMINS = ["adeyigbeminiyi414@gmail.com","adeyigbeminiy414@gmail.com"];
 const ADMIN_KEY = "sanctifi3d_admin_2026";
 
-type Tab = "posts" | "alpha" | "create" | "create-alpha" | "subscribers" | "analytics";
+type Tab = "posts" | "alpha" | "create" | "create-alpha" | "subscribers" | "analytics" | "userSubmissions";
 
 export default function Admin() {
   const { dark, toggle } = useTheme();
   const [posts, setPosts] = useState<any[]>([]);
   const [alphas, setAlphas] = useState<any[]>([]);
   const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [submissions, setUserSubmissions] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<{totalViews:number, topPosts:any[], recentSubs:any[], subsByDay:any[], viewsByPost:any[]}>({totalViews:0, topPosts:[], recentSubs:[], subsByDay:[], viewsByPost:[]});
   const [tab, setTab] = useState<Tab>("posts");
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
@@ -62,6 +63,38 @@ export default function Admin() {
   async function fetchAll() { await Promise.all([fetchPosts(), fetchAlphas(), fetchSubs()]); }
   async function fetchPosts() { const s = await getDocs(query(collection(db,"posts"),orderBy("createdAt","desc"))); setPosts(s.docs.map(d=>({id:d.id,...d.data()}))); }
   async function fetchAlphas() { const s = await getDocs(query(collection(db,"alpha"),orderBy("createdAt","desc"))); setAlphas(s.docs.map(d=>({id:d.id,...d.data()}))); }
+  async function fetchUserSubmissions() {
+    const snap = await getDocs(query(collection(db, "submissions"), orderBy("createdAt","desc")));
+    setUserSubmissions(snap.docs.map(d => ({ id:d.id, ...d.data() })));
+  }
+
+  async function approveSubmission(sub: any) {
+    // Move to posts or alpha collection
+    const col = sub.type === "alpha" ? "alpha" : "posts";
+    const ref = await addDoc(collection(db, col), {
+      title: sub.title,
+      content: sub.content,
+      category: sub.category,
+      sourceUrl: sub.sourceUrl || "",
+      sourceLabel: sub.authorName || "Community",
+      type: "community",
+      status: "approved",
+      date: sub.date,
+      createdAt: sub.createdAt,
+      authorName: sub.authorName,
+      authorUid: sub.uid,
+    });
+    await updateDoc(doc(db, "submissions", sub.id), { status:"approved", publishedId: ref.id });
+    setUserSubmissions(s => s.map(x => x.id===sub.id ? {...x, status:"approved", publishedId:ref.id} : x));
+    flash("Submission approved and published!");
+  }
+
+  async function rejectSubmission(id: string, note: string) {
+    await updateDoc(doc(db, "submissions", id), { status:"rejected", adminNote: note });
+    setUserSubmissions(s => s.map(x => x.id===id ? {...x, status:"rejected", adminNote:note} : x));
+    flash("Submission rejected.");
+  }
+
   async function fetchAnalytics() {
     // Get views
     const viewsSnap = await getDocs(collection(db, "views"));
@@ -470,6 +503,37 @@ export default function Admin() {
               <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadLogo(e.target.files[0])} style={{ display:"block", marginBottom:16, color:"var(--fg)", fontSize:14 }} />
               <p style={{ fontSize:12, color:"var(--sub)" }}>Recommended: 200x200px square PNG or JPG</p>
             </div>
+          </div>
+        )}
+        {tab==="userSubmissions"&&(
+          <div>
+            <h3 style={{fontWeight:800,fontSize:18,color:fg,margin:"0 0 20px"}}>📥 Community Submissions</h3>
+            {submissions.length===0?<p style={{color:sub}}>No submissions yet.</p>:submissions.map((s:any)=>(
+              <div key={s.id} style={{background:cardBg,border:`1px solid ${s.status==="pending"?"rgba(251,191,36,.3)":border}`,borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+                  <div style={{flex:1}}>
+                    <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:6}}>
+                      <span style={{fontSize:11,fontWeight:700,color:"#34d399",textTransform:"uppercase"}}>{s.type}</span>
+                      <span style={{fontSize:11,background:s.status==="approved"?"rgba(52,211,153,.1)":s.status==="rejected"?"rgba(248,113,113,.1)":"rgba(251,191,36,.1)",color:s.status==="approved"?"#34d399":s.status==="rejected"?"#f87171":"#fbbf24",borderRadius:999,padding:"2px 10px",fontWeight:700}}>{s.status}</span>
+                      <span style={{fontSize:11,color:sub}}>{s.category}</span>
+                    </div>
+                    <h4 style={{fontSize:15,fontWeight:800,color:fg,margin:"0 0 4px"}}>{s.title}</h4>
+                    <p style={{fontSize:12,color:sub,margin:"0 0 6px"}}>by {s.authorName} · {s.date}</p>
+                    <p style={{fontSize:13,color:fg,lineHeight:1.6,margin:0}}>{s.content?.slice(0,200)}{s.content?.length>200?"...":""}</p>
+                    {s.sourceUrl && <a href={s.sourceUrl} target="_blank" style={{fontSize:12,color:"#38bdf8",marginTop:6,display:"block"}}>🔗 {s.sourceUrl}</a>}
+                  </div>
+                  {s.status==="pending" && (
+                    <div style={{display:"flex",flexDirection:"column",gap:8,flexShrink:0}}>
+                      <button onClick={()=>approveSubmission(s)} style={{...btn("#34d399","#000"),padding:"8px 16px"}}>✓ Approve</button>
+                      <button onClick={()=>{ const note=prompt("Rejection reason (optional):"); rejectSubmission(s.id, note||""); }} style={{...btn("rgba(248,113,113,.12)","#f87171"),border:"1px solid rgba(248,113,113,.3)",padding:"8px 16px"}}>✕ Reject</button>
+                    </div>
+                  )}
+                  {s.status==="approved" && s.publishedId && (
+                    <a href={`/post/${s.publishedId}`} style={{fontSize:12,color:"#34d399",fontWeight:700,textDecoration:"none"}}>View →</a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
         {tab==="analytics"&&(

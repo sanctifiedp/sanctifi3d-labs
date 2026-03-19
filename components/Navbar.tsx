@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "./AuthProvider";
 import { useState, useEffect } from "react";
 import { useTheme } from "../lib/ThemeContext";
 import SiteLogo from "./SiteLogo";
@@ -7,6 +8,7 @@ import { collection, addDoc } from "firebase/firestore";
 
 export default function Navbar() {
   const { dark, toggle } = useTheme();
+  const { user, signIn } = useAuth();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -124,6 +126,22 @@ export default function Navbar() {
               {dark ? "☀️" : "🌙"}
             </button>
 
+            {/* Profile */}
+            {user ? (
+              <a href="/profile" title={user.displayName||"Profile"} style={{ flexShrink:0 }}>
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="" style={{ width:30, height:30, borderRadius:"50%", border:"2px solid #34d399", display:"block" }} />
+                ) : (
+                  <div style={{ width:30, height:30, borderRadius:"50%", background:"#34d399", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:900, color:"#000" }}>
+                    {(user.displayName||user.email||"U")[0].toUpperCase()}
+                  </div>
+                )}
+              </a>
+            ) : (
+              <button onClick={signIn} style={{ background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.08)", borderRadius:999, padding:"7px 14px", fontSize:12, fontWeight:700, color:"rgba(255,255,255,.8)", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>
+                Sign In
+              </button>
+            )}
             {/* Subscribe */}
             <button onClick={() => setSubOpen(o => !o)} style={{ background: "#34d399", color: "#000", border: "none", borderRadius: 999, padding: "8px 18px", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
               Subscribe
