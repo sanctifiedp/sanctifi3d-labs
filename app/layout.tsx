@@ -35,6 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="google-adsense-account" content="ca-pub-2613718694144871" />
         <meta name="google-site-verification" content="gzTbfqeoulhdJOI_6g0Keb5X-5tAaVLfXwJ5B47572c" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png" />
+        <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
