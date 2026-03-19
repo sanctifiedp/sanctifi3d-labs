@@ -287,6 +287,7 @@ function HomeInner() {
             <a href="https://x.com/Sanctifi3d_1" target="_blank" style={{ color:"var(--sub)" }}>𝕏 Twitter</a>
             <a href="/alpha" style={{ color:"var(--sub)" }}>⚡ Alpha</a>
             <a href="/about" style={{ color:"var(--sub)" }}>About</a>
+            <a href="/rooms" style={{ color:"var(--sub)" }}>💬 Rooms</a>
             <a href="/bookmarks" style={{ color:"var(--sub)" }}>🔖 Bookmarks</a>
             <a href="/feed.xml" style={{ color:"var(--sub)" }}>📡 RSS</a>
             <a href="/widget/embed" style={{ color:"var(--sub)" }}>Widget</a>

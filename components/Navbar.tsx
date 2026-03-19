@@ -47,6 +47,7 @@ export default function Navbar() {
     { label: "Alpha ⚡", href: "/alpha" },
     { label: "Bookmarks", href: "/bookmarks" },
     { label: "About", href: "/about" },
+    { label: "💬 Rooms", href: "/rooms" },
   ];
 
   return (
