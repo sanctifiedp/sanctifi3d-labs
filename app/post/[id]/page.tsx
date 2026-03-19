@@ -65,6 +65,18 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
       let og = document.querySelector('meta[property="og:title"]');
       if(og) og.setAttribute('content', post.title);
       let ogImg = document.querySelector('meta[property="og:image"]');
+      let ogTitle = document.querySelector('meta[property="og:title"]') || document.createElement('meta');
+      (ogTitle as any).setAttribute('property','og:title');
+      (ogTitle as any).setAttribute('content', post.title);
+      if (!document.querySelector('meta[property="og:title"]')) document.head.appendChild(ogTitle as any);
+      let ogDesc = document.querySelector('meta[property="og:description"]') || document.createElement('meta');
+      (ogDesc as any).setAttribute('property','og:description');
+      (ogDesc as any).setAttribute('content', post.content?.replace(/<[^>]+>/g,'').slice(0,160));
+      if (!document.querySelector('meta[property="og:description"]')) document.head.appendChild(ogDesc as any);
+      let twCard = document.querySelector('meta[name="twitter:card"]') || document.createElement('meta');
+      (twCard as any).setAttribute('name','twitter:card');
+      (twCard as any).setAttribute('content','summary_large_image');
+      if (!document.querySelector('meta[name="twitter:card"]')) document.head.appendChild(twCard as any);
       if(ogImg && post.imageUrl) ogImg.setAttribute('content', post.imageUrl);
     }
   }, [post]);

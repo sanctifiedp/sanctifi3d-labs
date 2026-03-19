@@ -86,12 +86,29 @@ export default function Admin() {
     });
     await updateDoc(doc(db, "submissions", sub.id), { status:"approved", publishedId: ref.id });
     setUserSubmissions(s => s.map(x => x.id===sub.id ? {...x, status:"approved", publishedId:ref.id} : x));
+    // Notify user
+    if (sub.authorEmail) {
+      await fetch("/api/notify-submission", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ email:sub.authorEmail, name:sub.authorName, title:sub.title, status:"approved", link:`${process.env.NEXT_PUBLIC_SITE_URL||"https://sanctifi3d-labs.vercel.app"}/post/${ref.id}` })
+      });
+    }
     flash("Submission approved and published!");
   }
 
   async function rejectSubmission(id: string, note: string) {
     await updateDoc(doc(db, "submissions", id), { status:"rejected", adminNote: note });
     setUserSubmissions(s => s.map(x => x.id===id ? {...x, status:"rejected", adminNote:note} : x));
+    // Notify user
+    const sub = submissions.find((x:any) => x.id === id);
+    if (sub?.authorEmail) {
+      await fetch("/api/notify-submission", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ email:sub.authorEmail, name:sub.authorName, title:sub.title, status:"rejected", note })
+      });
+    }
     flash("Submission rejected.");
   }
 

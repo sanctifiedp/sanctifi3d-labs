@@ -15,12 +15,15 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState<"submissions"|"bookmarks">("submissions");
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [msg, setMsg] = useState("");
+  const [followedTopics, setFollowedTopics] = useState<string[]>([]);
+  const TOPICS = ["Web3","Crypto","DeFi","NFT","Design","AI Tools","Airdrop","Bounty","Grant"];
 
   useEffect(() => {
     if (!loading && user) {
       loadProfile();
       loadSubmissions();
       loadBookmarks();
+      loadTopics();
     }
   }, [user, loading]);
 
@@ -56,6 +59,19 @@ export default function Profile() {
     const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     data.sort((a:any,b:any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     setSubmissions(data);
+  }
+
+  async function loadTopics() {
+    const snap = await getDoc(doc(db, "users", user!.uid));
+    if (snap.exists()) setFollowedTopics(snap.data().followedTopics || []);
+  }
+
+  async function toggleTopic(topic: string) {
+    const updated = followedTopics.includes(topic)
+      ? followedTopics.filter(t => t !== topic)
+      : [...followedTopics, topic];
+    setFollowedTopics(updated);
+    await setDoc(doc(db, "users", user!.uid), { followedTopics: updated }, { merge: true });
   }
 
   async function loadBookmarks() {
@@ -139,6 +155,13 @@ export default function Profile() {
                   </span>
                 </div>
                 <p style={{ color:"var(--sub)", fontSize:13, margin:"0 0 4px" }}>{user.email}</p>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:6 }}>
+                  <span style={{ fontSize:11, color:"var(--sub)" }}>🔗</span>
+                  <a href={`/profile/${user.uid}`} target="_blank" style={{ fontSize:11, color:"#34d399", textDecoration:"none", fontWeight:600 }}>
+                    sanctifi3d-labs.vercel.app/profile/{user.uid.slice(0,8)}...
+                  </a>
+                  <button onClick={()=>{ navigator.clipboard.writeText(`https://sanctifi3d-labs.vercel.app/profile/${user.uid}`); }} style={{ background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.2)", borderRadius:6, padding:"3px 8px", fontSize:10, color:"#34d399", cursor:"pointer", fontFamily:"inherit" }}>Copy</button>
+                </div>
                 {profile?.bio && <p style={{ color:"var(--fg)", fontSize:14, margin:"8px 0 0", lineHeight:1.7 }}>{profile.bio}</p>}
                 <p style={{ color:"var(--sub)", fontSize:11, margin:"8px 0 0" }}>Joined {profile?.joinedAt?.slice(0,10)}</p>
               </div>
@@ -176,7 +199,7 @@ export default function Profile() {
 
         {/* Tabs */}
         <div style={{ display:"flex", gap:8, marginBottom:20 }}>
-          {(["submissions","bookmarks"] as const).map(t => (
+          {(["submissions","bookmarks","topics"] as const).map(t => (
             <button key={t} onClick={()=>setActiveTab(t)} style={{ background:activeTab===t?"#34d399":"transparent", color:activeTab===t?"#000":"var(--sub)", border:"1px solid var(--border)", borderRadius:999, padding:"7px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", textTransform:"capitalize" }}>
               {t}
             </button>
@@ -207,6 +230,23 @@ export default function Profile() {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Topics */}
+        {activeTab === "topics" && (
+          <div>
+            <p style={{ color:"var(--sub)", fontSize:14, marginBottom:20, lineHeight:1.7 }}>Follow topics to get personalized content recommendations. Your followed topics will influence what shows up first for you.</p>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
+              {TOPICS.map(t => (
+                <button key={t} onClick={()=>toggleTopic(t)} style={{ background:followedTopics.includes(t)?"#34d399":"var(--card)", color:followedTopics.includes(t)?"#000":"var(--sub)", border:`1px solid ${followedTopics.includes(t)?"#34d399":"var(--border)"}`, borderRadius:999, padding:"8px 20px", fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"inherit", transition:"all .2s", display:"flex", alignItems:"center", gap:6 }}>
+                  {followedTopics.includes(t) ? "✓ " : "+ "}{t}
+                </button>
+              ))}
+            </div>
+            {followedTopics.length > 0 && (
+              <p style={{ color:"#34d399", fontSize:13, marginTop:16, fontWeight:600 }}>✦ Following {followedTopics.length} topic{followedTopics.length>1?"s":""}: {followedTopics.join(", ")}</p>
+            )}
           </div>
         )}
 
