@@ -57,8 +57,7 @@ export default function Admin() {
   const inp = { width:"100%", background:"var(--card)", border:`1px solid var(--border)`, borderRadius:8, padding:"10px 14px", color:"var(--fg)", fontSize:14, fontFamily:"inherit", outline:"none", marginBottom:10, boxSizing:"border-box" } as any;
   const btn = (bg2:string, col:string, extra?:any) => ({ background:bg2, color:col, border:"none", borderRadius:8, padding:"8px 16px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", ...extra } as any);
 
-  useEffect(() => { auth.onAuthStateChanged(u => { if(u && ADMINS.includes(u.email||"")) setUser(u); }); },[]);
-  useEffect(() => { if(user){ fetchAll(); } },[user]);
+  useEffect(() => { fetchAll(); },[]);
 
   async function fetchAll() { await Promise.all([fetchPosts(), fetchAlphas(), fetchSubs()]); }
   async function fetchPosts() { const s = await getDocs(query(collection(db,"posts"),orderBy("createdAt","desc"))); setPosts(s.docs.map(d=>({id:d.id,...d.data()}))); }
