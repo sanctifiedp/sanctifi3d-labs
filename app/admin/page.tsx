@@ -6,6 +6,7 @@ import { collection, setDoc, getDocs, addDoc, deleteDoc, updateDoc, doc, query, 
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useTheme } from "../../lib/ThemeContext";
 import RichEditor from "../../components/RichEditor";
+import RichPostEditor from "../../components/RichPostEditor";
 
 const ADMINS = ["adeyigbeminiyi414@gmail.com","adeyigbeminiy414@gmail.com"];
 const ADMIN_KEY = "sanctifi3d_admin_2026";
