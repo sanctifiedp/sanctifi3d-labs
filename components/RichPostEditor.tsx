@@ -41,7 +41,7 @@ export default function RichPostEditor({ content, onChange, placeholder = "Start
       Link.configure({ openOnClick: false, HTMLAttributes: { style: "color:#34d399;text-decoration:underline;" } }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       CharacterCount,
-      Image.configure({ resizable: false, HTMLAttributes: { style: "max-width:100%;border-radius:10px;margin:12px 0;" } }),
+      Image.configure({ HTMLAttributes: { style: "max-width:100%;border-radius:10px;margin:12px 0;" } }),
       Placeholder.configure({ placeholder }),
     ],
     content,
