@@ -11,7 +11,7 @@ import RichEditor from "../../components/RichEditor";
 const ADMINS = ["adeyigbeminiyi414@gmail.com","adeyigbeminiy414@gmail.com"];
 const ADMIN_KEY = "sanctifi3d_admin_2026";
 
-type Tab = "posts" | "alpha" | "create" | "create-alpha" | "subscribers" ;
+type Tab = "posts" | "alpha" | "create" | "create-alpha" | "subscribers" | "analytics";
 
 export default function Admin() {
   const { dark, toggle } = useTheme();
