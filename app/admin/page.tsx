@@ -232,7 +232,7 @@ export default function Admin() {
         <input value={editingPost.imageUrl||""} onChange={e=>setEditingPost({...editingPost,imageUrl:e.target.value})} style={inp} placeholder="Cover image URL"/>
         {editingPost.imageUrl&&<img src={editingPost.imageUrl} style={{width:"100%",height:140,objectFit:"cover",borderRadius:8,marginBottom:10}}/>}
         <p style={{fontSize:13,color:sub,marginBottom:8}}>Content</p>
-        <RichEditor value={editingPost.content||""} onChange={v=>setEditingPost({...editingPost,content:v})} dark={dark}/>
+        <RichPostEditor content={editingPost.content||""} onChange={v=>setEditingPost({...editingPost,content:v})}/>
         <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}><a href="/admin/settings" style={{background:"#1a1a1a",border:"1px solid #2a2a2a",borderRadius:8,padding:"8px 16px",fontSize:13,color:"#9ca3af",textDecoration:"none",fontWeight:600}}>⚙ Settings →</a></div>
         {msg&&<p style={{color:"#34d399",marginTop:12,fontWeight:600}}>{msg}</p>}
         <div style={{display:"flex",gap:12,marginTop:20}}>
@@ -264,7 +264,7 @@ export default function Admin() {
         <input value={editingAlpha.imageUrl||""} onChange={e=>setEditingAlpha({...editingAlpha,imageUrl:e.target.value})} style={inp} placeholder="Cover image URL"/>
         {editingAlpha.imageUrl&&<img src={editingAlpha.imageUrl} style={{width:"100%",height:140,objectFit:"cover",borderRadius:8,marginBottom:10}}/>}
         <p style={{fontSize:13,color:sub,marginBottom:8}}>Content</p>
-        <RichEditor value={editingAlpha.content||""} onChange={v=>setEditingAlpha({...editingAlpha,content:v})} dark={dark}/>
+        <RichPostEditor content={editingAlpha.content||""} onChange={v=>setEditingAlpha({...editingAlpha,content:v})}/>
         <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}><a href="/admin/settings" style={{background:"#1a1a1a",border:"1px solid #2a2a2a",borderRadius:8,padding:"8px 16px",fontSize:13,color:"#9ca3af",textDecoration:"none",fontWeight:600}}>⚙ Settings →</a></div>
         {msg&&<p style={{color:"#34d399",marginTop:12,fontWeight:600}}>{msg}</p>}
         <div style={{display:"flex",gap:12,marginTop:20}}>
