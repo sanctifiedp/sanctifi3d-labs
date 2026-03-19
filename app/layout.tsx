@@ -8,6 +8,7 @@ import CryptoTicker from "../components/CryptoTicker";
 import BackToTop from "../components/BackToTop";
 import LabsAI from "../components/LabsAI";
 import "./globals.css";
+import { AuthProvider } from "../components/AuthProvider";
 
 export const metadata: Metadata = {
   title: "Sanctifi3d Labs — Web3, Crypto, Design & AI Intelligence",
@@ -48,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <PWARegister />
       <body>
-        <ThemeProvider>
+        <AuthProvider><ThemeProvider>
           <CryptoTicker />
           <GlobalShapes />
           <AdSense />
@@ -56,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <BackToTop />
           <LabsAI />
-        </ThemeProvider>
+        </ThemeProvider></AuthProvider>
       </body>
     </html>
   );
