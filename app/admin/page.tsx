@@ -299,7 +299,7 @@ export default function Admin() {
           <h1 style={{fontWeight:900,fontSize:20,color:fg}}>Sanctifi3d<span style={{color:"#34d399"}}>Labs</span> Admin</h1>
           <div style={{display:"flex",gap:10}}>
             <button onClick={toggle} style={btn("var(--card)",fg,{border:`1px solid ${border}`})}>{dark?"☀️ Light":"🌙 Dark"}</button>
-            <button onClick={()=>signOut(auth).then(()=>setUser(null))} style={btn("rgba(248,113,113,.15)","#f87171")}>Logout</button>
+            <button onClick={()=>{sessionStorage.removeItem("s3d_admin");window.location.reload();}} style={btn("rgba(248,113,113,.15)","#f87171")}>Logout</button>
           </div>
         </div>
 
