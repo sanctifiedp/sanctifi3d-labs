@@ -12,7 +12,7 @@ export default function Profile() {
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"submissions"|"bookmarks">("submissions");
+  const [activeTab, setActiveTab] = useState<"submissions"|"bookmarks"|"topics">("submissions");
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [msg, setMsg] = useState("");
   const [followedTopics, setFollowedTopics] = useState<string[]>([]);
